@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SariSari · dark/light mode + login</title>
+    <!-- Google Font & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/inventory management system test.css">
+</head>
+<body class="light">
+    <div class="toast-message" id="toastMsg">✨</div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginOverlay" class="login-container">
+        <div class="login-card">
+            <div class="store-icon"><i class="fas fa-store-alt"></i></div>
+            <h2>Sari-Sari</h2>
+            <div class="sub">management system · log in</div>
+            <input type="text" class="login-input" id="usernameInput" placeholder="username" value="admin">
+            <input type="password" class="login-input" id="passwordInput" placeholder="password" value="password">
+            <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Enter dashboard</button>
+            <div id="loginError" class="login-error"></div>
+            <div class="demo-hint"><i class="fas fa-lightbulb"></i> demo: any username / password</div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboardWrapper" class="dashboard-wrapper">
+        <div class="logout-area">
+            <div class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i> Dark mode</div>
+            <div class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> log out</div>
+        </div>
+
+        <div class="app">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <div class="store-logo"><i class="fas fa-store"></i><span>Sari-Sari</span></div>
+                <div class="nav-item active" data-section="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</div>
+                <div class="nav-item" data-section="pos"><i class="fas fa-cash-register"></i> POS</div>
+                <div class="nav-item" data-section="inventory"><i class="fas fa-boxes"></i> Inventory</div>
+                <div class="nav-item" data-section="stock"><i class="fas fa-truck"></i> Stock</div>
+                <div class="nav-item" data-section="users"><i class="fas fa-users"></i> Users</div>
+                <div class="nav-item" data-section="reports"><i class="fas fa-file-alt"></i> Reports</div>
+            </div>
+
+            <!-- MAIN PANELS (all interactive, shortened for readability but full) -->
+            <div class="main">
+                <!-- DASHBOARD PANEL -->
+                <div id="dashboardPanel" class="section-panel active-panel">
+                    <div class="section-header"><h2><i class="fas fa-chart-pie"></i> Dashboard</h2><div class="time-badge" onclick="toast('🔄 dashboard refreshed')"><i class="fas fa-sync-alt"></i> refresh</div></div>
+                    <div class="stat-grid">
+                        <div class="stat-card"><div>Today's Sales <i class="fas fa-sun"></i></div><div class="stat-number">$646.00</div><div>Cash & Credit · +12%</div><div class="action-btn" onclick="toast('💰 viewing today\'s details')">view breakdown <i class="fas fa-arrow-right"></i></div></div>
+                        <div class="stat-card"><div>Total Revenue <i class="fas fa-coins"></i></div><div class="stat-number">$646.00</div><div>All-time sales</div><div class="action-btn" onclick="toast('📈 historical revenue chart')">show chart</div></div>
+                        <div class="stat-card"><div>Total Products <i class="fas fa-cubes"></i></div><div class="stat-number">10</div><div><span class="chip-low">0 low stock</span> ⚪ all good</div><div class="action-btn" onclick="toast('📦 open product catalog')">manage</div></div>
+                        <div class="stat-card"><div>Customer Credits <i class="fas fa-hand-holding-heart"></i></div><div class="stat-number">$0.00</div><div>3 customers · 0 outstanding</div><div class="action-btn" onclick="toast('🤝 show credit accounts')">view customers</div></div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:22px;">
+                        <div class="alert-box"><h4>📈 Sales trend (last 7 days)</h4><div class="bars"><div class="bar-item"><div class="bar" style="height:50px;"></div>Feb19</div><div class="bar-item"><div class="bar" style="height:72px;"></div>Feb20</div><div class="bar-item"><div class="bar" style="height:44px;"></div>Feb21</div><div class="bar-item"><div class="bar" style="height:86px;"></div>Feb22</div><div class="bar-item"><div class="bar" style="height:110px;"></div>Feb23</div><div class="bar-item"><div class="bar" style="height:68px;"></div>Feb24</div><div class="bar-item"><div class="bar" style="height:92px;"></div>Feb25</div></div><div class="action-btn" onclick="toast('📊 download 7-day report')">export <i class="fas fa-download"></i></div></div>
+                        <div class="alert-box"><h4>🏆 Top selling</h4><div class="product-row"><span>Liboog</span><div class="product-bar"><div style="width:80%; height:8px; background:#4797b5;"></div></div><span>$480</span></div><div class="product-row"><span>Pale Pilsen</span><div class="product-bar"><div style="width:62%; height:8px; background:#4797b5;"></div></div><span>$372</span></div><div class="product-row"><span>Century Tuna</span><div class="product-bar"><div style="width:45%; height:8px; background:#4797b5;"></div></div><span>$270</span></div><div class="action-btn" onclick="toast('⭐ show full product ranking')">view all products</div></div>
+                    </div>
+                    <div class="triplet">
+                        <div class="alert-box"><i class="fas fa-exclamation-triangle"></i> <strong>Low stock</strong><div>✅ 0 items</div><div class="action-btn" onclick="toast('⚠️ no low stock')">check</div></div>
+                        <div class="alert-box"><i class="fas fa-clipboard-list"></i> <strong>Pending POs</strong><div>📦 none</div><div class="action-btn" onclick="toast('📬 create new PO')">+ order</div></div>
+                        <div class="alert-box"><i class="fas fa-arrows-spin"></i> <strong>Recent stock</strong><div class="movement-item"><i class="fas fa-box-open"></i> Liboog +24</div><div class="movement-item"><i class="fas fa-boxes"></i> Pale Pilsen 8 cases</div><div class="action-btn" onclick="toast('📋 full stock movement log')">view all</div></div>
+                    </div>
+                </div>
+                <!-- OTHER PANELS (minimal for brevity, but all interactive) -->
+                <div id="posPanel" class="section-panel"><div class="section-header"><h2><i class="fas fa-cash-register"></i> POS</h2><div class="time-badge" onclick="toast('new transaction')">➕ new sale</div></div><div class="pos-grid"><div class="info-card"><h3>🛒 cart</h3><div class="simple-list"><li>Liboog x2 $160 <i class="fas fa-trash" onclick="toast('item removed')"></i></li><li>total $492</li></div><div class="action-btn" onclick="toast('checkout')">checkout</div></div><div class="info-card"><h3>actions</h3><div class="action-btn" onclick="toast('scan')"><i class="fas fa-barcode"></i> scan</div></div></div></div>
+                <div id="inventoryPanel" class="section-panel"><div class="section-header"><h2><i class="fas fa-boxes"></i> Inventory</h2><div class="time-badge" onclick="toast('sync')">sync</div></div><div class="mini-grid"><div class="info-card"><span class="badge">SKUs</span><div class="stat-number">10</div><div class="action-btn" onclick="toast('add')">add</div></div></div></div>
+                <div id="stockPanel" class="section-panel"><div class="section-header"><h2><i class="fas fa-truck"></i> Stock</h2><div class="time-badge" onclick="toast('new PO')">➕ create PO</div></div><div class="simple-list"><li><i class="fas fa-dolly"></i> PO#2312 <span class="badge">open</span> <i class="fas fa-check-circle" onclick="toast('mark received')"></i></li></div></div>
+                <div id="usersPanel" class="section-panel"><div class="section-header"><h2><i class="fas fa-users"></i> Users</h2><div class="time-badge" onclick="toast('invite')">➕ invite</div></div><div class="simple-list"><li><i class="fas fa-user-circle"></i> Aling Nena · manager <i class="fas fa-cog" onclick="toast('edit')"></i></li></div></div>
+                <div id="reportsPanel" class="section-panel"><div class="section-header"><h2><i class="fas fa-file-alt"></i> Reports</h2><div class="time-badge" onclick="toast('generate')">generate</div></div><div class="mini-grid"><div class="info-card"><span class="badge">weekly sales</span><div class="stat-number">$3,270</div><div class="action-btn" onclick="toast('PDF')">PDF</div></div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // toast function
+        function toast(msg) {
+            const t = document.getElementById('toastMsg');
+            t.textContent = '✨ ' + msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 1300);
+        }
+
+        // login functionality
+        const loginOverlay = document.getElementById('loginOverlay');
+        const dashboardWrap = document.getElementById('dashboardWrapper');
+        const loginBtn = document.getElementById('loginBtn');
+        const username = document.getElementById('usernameInput');
+        const password = document.getElementById('passwordInput');
+        const loginError = document.getElementById('loginError');
+
+        function login() {
+            if (username.value.trim() !== '' && password.value.trim() !== '') {
+                loginOverlay.style.opacity = '0';
+                loginOverlay.style.visibility = 'hidden';
+                dashboardWrap.classList.add('visible');
+                loginError.innerText = '';
+                toast('logged in successfully');
+            } else {
+                loginError.innerText = 'please enter any username/password (demo)';
+            }
+        }
+        loginBtn.addEventListener('click', login);
+        [username, password].forEach(field => field.addEventListener('keypress', (e) => { if(e.key==='Enter') login(); }));
+
+        // logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            loginOverlay.style.opacity = '1';
+            loginOverlay.style.visibility = 'visible';
+            dashboardWrap.classList.remove('visible');
+            username.value = 'admin';
+            password.value = 'password';
+            toast('logged out');
+        });
+
+        // dark/light theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light mode' : '<i class="fas fa-moon"></i> Dark mode';
+            toast(isDark ? 'dark mode enabled' : 'light mode enabled');
+        });
+
+        // sidebar navigation
+        (function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const panels = {
+                dashboard: document.getElementById('dashboardPanel'),
+                pos: document.getElementById('posPanel'),
+                inventory: document.getElementById('inventoryPanel'),
+                stock: document.getElementById('stockPanel'),
+                users: document.getElementById('usersPanel'),
+                reports: document.getElementById('reportsPanel')
+            };
+            function setActive(section) {
+                navItems.forEach(n => n.classList.remove('active'));
+                Object.values(panels).forEach(p => p?.classList.remove('active-panel'));
+                const activeNav = Array.from(navItems).find(n => n.dataset.section === section);
+                if(activeNav) activeNav.classList.add('active');
+                if(panels[section]) panels[section].classList.add('active-panel');
+            }
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const s = item.dataset.section;
+                    if(s) { setActive(s); toast(`switched to ${s}`); }
+                });
+            });
+            setActive('dashboard');
+        })();
+    </script>
+</body>
+</html>
