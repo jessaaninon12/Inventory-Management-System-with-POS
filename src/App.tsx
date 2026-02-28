@@ -256,6 +256,7 @@ export default function App() {
   const [toast, setToast] = useState({ message: '', visible: false });
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('password');
+  const [selectedRole, setSelectedRole] = useState<User['role']>('Admin');
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -273,6 +274,32 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [dashboardDetail, setDashboardDetail] = useState<'sales' | 'revenue' | 'products' | 'credits' | null>(null);
+  const [showTopSelling, setShowTopSelling] = useState(false);
+  const [showLowStock, setShowLowStock] = useState(false);
+  const [showPendingPOs, setShowPendingPOs] = useState(false);
+  const [showRecentStock, setShowRecentStock] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [pendingPOs, setPendingPOs] = useState([
+    { id: '1', name: 'PO#2312', vendor: 'San Miguel Corp', items: 'Pale Pilsen x100', date: '2026-02-26' },
+    { id: '2', name: 'PO#2313', vendor: 'CDO Foodsphere', items: 'Century Tuna x50', date: '2026-02-27' },
+    { id: '3', name: 'PO#2314', vendor: 'Monde Nissin', items: 'Lucky Me Noodles x200', date: '2026-02-28' },
+  ]);
+
+  const topSellingData = [
+    { name: 'Liboog', amount: 480, sold: 6, color: 'bg-btn-primary' },
+    { name: 'Pale Pilsen', amount: 276, sold: 6, color: 'bg-emerald-500' },
+    { name: 'Century Tuna', amount: 210, sold: 6, color: 'bg-amber-500' },
+    { name: 'Lucky Me Noodles', amount: 120, sold: 8, color: 'bg-purple-500' },
+    { name: 'Nescafe 3-in-1', amount: 100, sold: 10, color: 'bg-pink-500' },
+  ];
+
+  const recentStocksData = [
+    { product: 'Liboog', change: '+24', date: '2026-02-28T14:30:00' },
+    { product: 'Pale Pilsen', change: '+15', date: '2026-02-27T10:00:00' },
+    { product: 'Century Tuna', change: '+45', date: '2026-02-26T09:15:00' },
+    { product: 'Lucky Me Noodles', change: '+10', date: '2026-02-25T11:00:00' },
+    { product: 'Nescafe 3-in-1', change: '+300', date: '2026-02-24T08:30:00' },
+  ];
 
   const filteredProducts = useMemo(() => {
     return inventoryProducts.filter(p => 
@@ -280,6 +307,10 @@ export default function App() {
       p.category.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     );
   }, [inventoryProducts, debouncedSearchQuery]);
+
+  const lowStockItems = useMemo(() => {
+    return inventoryProducts.filter(p => p.stock < (p.lowStockThreshold || LOW_STOCK_THRESHOLD));
+  }, [inventoryProducts]);
 
   // API Integration
   const fetchProducts = async () => {
@@ -348,14 +379,9 @@ export default function App() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (username.trim() && password.trim()) {
-      // Simple role assignment for demo
-      const role: User['role'] = username.toLowerCase().includes('manager') ? 'Manager' : 
-                   username.toLowerCase().includes('ceo') ? 'CEO' :
-                   username.toLowerCase().includes('staff') ? 'Staff Worker' : 'Admin';
-      
       setCurrentUser({ 
         username, 
-        role,
+        role: selectedRole,
         firstName: 'Demo',
         surname: 'User',
         email: 'demo@example.com',
@@ -363,9 +389,9 @@ export default function App() {
         address: '123 Sari-Sari St.'
       });
       setIsLoggedIn(true);
-      showToast(`Logged in as ${role}`);
+      showToast(`Logged in as ${selectedRole}`);
     } else {
-      setLoginError('Please enter any username/password (demo)');
+      setLoginError('Please enter a username and password');
     }
   };
 
@@ -415,6 +441,11 @@ export default function App() {
       document.body.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   if (!isLoggedIn) {
     if (isRegistering) {
@@ -537,6 +568,19 @@ export default function App() {
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
+            <div className="relative">
+              <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary" />
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value as User['role'])}
+                className="w-full pl-12 pr-6 py-4 bg-input-bg border border-input-border rounded-full text-lg outline-none focus:border-btn-primary focus:ring-4 focus:ring-badge-bg transition-all appearance-none cursor-pointer"
+              >
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="CEO">CEO</option>
+                <option value="Staff Worker">Staff Worker</option>
+              </select>
+            </div>
             <button 
               type="submit"
               className="w-full bg-btn-primary hover:bg-btn-primary-hover text-white py-4 rounded-full text-xl font-semibold shadow-xl transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
@@ -557,7 +601,7 @@ export default function App() {
           {loginError && <p className="text-red-400 mt-4">{loginError}</p>}
           
           <div className="mt-8 bg-badge-bg rounded-full py-3 px-6 text-badge-color border border-dashed border-input-border flex items-center justify-center gap-2 text-sm">
-            <Sun className="w-4 h-4" /> demo: any username / password
+            <Sun className="w-4 h-4" /> demo: any username / password · select role
           </div>
         </motion.div>
       </div>
@@ -573,7 +617,7 @@ export default function App() {
         <div className="flex items-center gap-6">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2.5 bg-btn-primary dark:bg-zinc-900 border border-btn-primary rounded-xl text-white hover:bg-blue-50 hover:text-btn-primary transition-all shadow-sm group"
+            className="p-2.5 bg-blue-500 dark:bg-blue-800 border border-blue-500 dark:border-blue-700 rounded-xl text-white hover:bg-white hover:text-blue-500 hover:border-blue-300 dark:hover:bg-blue-900 dark:hover:text-blue-200 dark:hover:border-blue-600 transition-all shadow-sm group"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -586,6 +630,14 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Real-time UTC Clock */}
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-main-bg border border-main-border rounded-xl shadow-sm font-mono">
+            <span className="text-sm font-bold text-login-text tracking-wider">
+              {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'UTC' })}
+            </span>
+            <span className="text-[9px] text-text-secondary font-bold uppercase">UTC</span>
+          </div>
+
           {/* Logo in Top Right */}
           <div className="flex items-center gap-2.5 px-4 py-2 bg-main-bg border border-main-border rounded-xl shadow-sm mr-2">
             <div className="w-8 h-8 bg-btn-primary rounded-lg flex items-center justify-center">
@@ -898,6 +950,206 @@ export default function App() {
                     </div>
                   )}
 
+                  {/* Top Selling Overlay */}
+                  {showTopSelling && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1100] flex items-center justify-center p-4">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-main-bg rounded-[40px] border border-main-border shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+                      >
+                        <div className="p-8 border-b border-main-border flex justify-between items-center bg-card-bg">
+                          <h3 className="text-2xl font-bold text-login-text flex items-center gap-3">
+                            🏆 All Top Selling Products
+                          </h3>
+                          <button onClick={() => setShowTopSelling(false)} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
+                            <X className="w-6 h-6" />
+                          </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8">
+                          <div className="space-y-4">
+                            {topSellingData.map((item, i) => (
+                              <div key={i} className="bg-card-bg rounded-2xl p-5 border border-card-border flex items-center justify-between hover:border-btn-primary transition-colors">
+                                <div className="flex items-center gap-4">
+                                  <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center text-white font-bold text-sm`}>
+                                    #{i + 1}
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-login-text">{item.name}</h4>
+                                    <p className="text-xs text-text-secondary">{item.sold} units sold</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-xl font-black text-btn-primary">${item.amount.toFixed(2)}</div>
+                                  <div className="w-24 bg-badge-bg h-1.5 rounded-full overflow-hidden mt-1">
+                                    <div className={`${item.color} h-full rounded-full`} style={{ width: `${(item.amount / 500) * 100}%` }}></div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex justify-end pt-6 border-t border-main-border mt-6">
+                            <div className="text-right">
+                              <div className="text-sm text-text-secondary uppercase font-bold">Total Revenue</div>
+                              <div className="text-4xl font-black text-btn-primary">
+                                ${topSellingData.reduce((acc, item) => acc + item.amount, 0).toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  )}
+
+                  {/* Low Stock Overlay */}
+                  {showLowStock && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1100] flex items-center justify-center p-4">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-main-bg rounded-[40px] border border-main-border shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+                      >
+                        <div className="p-8 border-b border-main-border flex justify-between items-center bg-card-bg">
+                          <h3 className="text-2xl font-bold text-login-text flex items-center gap-3">
+                            <AlertTriangle className="w-6 h-6 text-red-500" /> Low Stock Items
+                          </h3>
+                          <button onClick={() => setShowLowStock(false)} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
+                            <X className="w-6 h-6" />
+                          </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8">
+                          {lowStockItems.length === 0 ? (
+                            <div className="text-center py-12">
+                              <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+                              <h4 className="text-xl font-bold text-login-text mb-2">All Good!</h4>
+                              <p className="text-text-secondary">All items are well-stocked.</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {lowStockItems.map(product => (
+                                <div key={product.id} className="bg-red-50 dark:bg-red-900/10 rounded-2xl p-5 border border-red-200 dark:border-red-900/20 flex items-center justify-between">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
+                                      <AlertTriangle className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                      <h4 className="font-bold text-login-text">{product.name}</h4>
+                                      <p className="text-xs text-text-secondary">{product.category}</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="text-lg font-black text-red-600">{product.stock} left</div>
+                                    <div className="text-[10px] text-text-secondary uppercase font-bold">
+                                      Threshold: {product.lowStockThreshold || LOW_STOCK_THRESHOLD}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    </div>
+                  )}
+
+                  {/* Pending POs Overlay */}
+                  {showPendingPOs && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1100] flex items-center justify-center p-4">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-main-bg rounded-[40px] border border-main-border shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+                      >
+                        <div className="p-8 border-b border-main-border flex justify-between items-center bg-card-bg">
+                          <h3 className="text-2xl font-bold text-login-text flex items-center gap-3">
+                            <Truck className="w-6 h-6" /> Pending Purchase Orders
+                          </h3>
+                          <button onClick={() => setShowPendingPOs(false)} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
+                            <X className="w-6 h-6" />
+                          </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8">
+                          {pendingPOs.length === 0 ? (
+                            <div className="text-center py-12">
+                              <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+                              <h4 className="text-xl font-bold text-login-text mb-2">All Clear!</h4>
+                              <p className="text-text-secondary">No pending purchase orders.</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {pendingPOs.map(po => (
+                                <div key={po.id} className="bg-card-bg rounded-2xl p-5 border border-card-border flex items-center justify-between hover:border-btn-primary transition-colors">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-badge-bg rounded-xl flex items-center justify-center">
+                                      <Truck className="w-6 h-6 text-btn-primary" />
+                                    </div>
+                                    <div>
+                                      <h4 className="font-bold text-login-text">{po.name}</h4>
+                                      <p className="text-xs text-text-secondary">Vendor: {po.vendor}</p>
+                                      <p className="text-xs text-text-secondary">Items: {po.items}</p>
+                                      <p className="text-[10px] text-text-secondary mt-1">Date: {po.date}</p>
+                                    </div>
+                                  </div>
+                                  <button 
+                                    onClick={() => {
+                                      setPendingPOs(prev => prev.filter(p => p.id !== po.id));
+                                      showToast(`${po.name} resolved`);
+                                    }}
+                                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors shadow-sm"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4" /> Resolve
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    </div>
+                  )}
+
+                  {/* Recent Stock Overlay */}
+                  {showRecentStock && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1100] flex items-center justify-center p-4">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-main-bg rounded-[40px] border border-main-border shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+                      >
+                        <div className="p-8 border-b border-main-border flex justify-between items-center bg-card-bg">
+                          <h3 className="text-2xl font-bold text-login-text flex items-center gap-3">
+                            <History className="w-6 h-6" /> Recent Stock Changes
+                          </h3>
+                          <button onClick={() => setShowRecentStock(false)} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
+                            <X className="w-6 h-6" />
+                          </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8">
+                          <div className="space-y-4">
+                            {recentStocksData.map((stock, i) => (
+                              <div key={i} className="bg-card-bg rounded-2xl p-5 border border-card-border flex items-center justify-between hover:border-btn-primary transition-colors">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center">
+                                    <Boxes className="w-5 h-5 text-emerald-600" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-login-text">{stock.product}</h4>
+                                    <p className="text-xs text-text-secondary">
+                                      {new Date(stock.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                      {' · '}
+                                      {new Date(stock.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-xl font-black text-emerald-600">{stock.change}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <div className="lg:col-span-2 bg-alert-bg rounded-[26px] p-6 border border-alert-border">
                       <h4 className="font-medium mb-4 flex items-center justify-between">
@@ -928,7 +1180,7 @@ export default function App() {
                       <div className="bg-alert-bg rounded-[26px] p-6 border border-alert-border">
                         <h4 className="font-medium mb-4 flex items-center justify-between">
                           🏆 Top selling
-                          <button onClick={() => showToast('View all products')} className="text-[10px] text-badge-color uppercase font-bold">view all</button>
+                          <button onClick={() => setShowTopSelling(true)} className="text-[10px] text-badge-color uppercase font-bold hover:underline">view all</button>
                         </h4>
                         <div className="space-y-4">
                           {[
@@ -955,27 +1207,31 @@ export default function App() {
                     <div className="bg-alert-bg rounded-[26px] p-6 border border-alert-border flex items-center justify-between">
                       <div>
                         <div className="text-xs text-text-secondary uppercase font-bold mb-1">Low stock</div>
-                        <div className="text-xl font-medium text-emerald-500">✅ 0 items</div>
+                        <div className={`text-xl font-medium ${lowStockItems.length === 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {lowStockItems.length === 0 ? '✅ 0 items' : `⚠️ ${lowStockItems.length} items`}
+                        </div>
                       </div>
-                      <button onClick={() => showToast('Checking stock levels')} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
+                      <button onClick={() => setShowLowStock(true)} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
                         <ArrowRight className="w-5 h-5" />
                       </button>
                     </div>
                     <div className="bg-alert-bg rounded-[26px] p-6 border border-alert-border flex items-center justify-between">
                       <div>
                         <div className="text-xs text-text-secondary uppercase font-bold mb-1">Pending POs</div>
-                        <div className="text-xl font-medium text-text-secondary">📦 none</div>
+                        <div className="text-xl font-medium text-text-secondary">
+                          {pendingPOs.length === 0 ? '📦 none' : `📦 ${pendingPOs.length} pending`}
+                        </div>
                       </div>
-                      <button onClick={() => showToast('Opening PO management')} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
+                      <button onClick={() => setShowPendingPOs(true)} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
                         <Plus className="w-5 h-5" />
                       </button>
                     </div>
                     <div className="bg-alert-bg rounded-[26px] p-6 border border-alert-border flex items-center justify-between">
                       <div>
                         <div className="text-xs text-text-secondary uppercase font-bold mb-1">Recent stock</div>
-                        <div className="text-sm font-medium">Liboog +24</div>
+                        <div className="text-sm font-medium">{recentStocksData[0]?.product} {recentStocksData[0]?.change}</div>
                       </div>
-                      <button onClick={() => showToast('Viewing stock history')} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
+                      <button onClick={() => setShowRecentStock(true)} className="p-2 hover:bg-badge-bg rounded-full transition-colors">
                         <History className="w-5 h-5" />
                       </button>
                     </div>
@@ -1028,8 +1284,8 @@ export default function App() {
                             }}
                             className={`p-5 rounded-2xl border text-left transition-all group ${
                               product.stock < (product.lowStockThreshold || LOW_STOCK_THRESHOLD)
-                                ? 'bg-red-100/50 border-red-300 dark:bg-red-900/10 dark:border-red-900/30' 
-                                : 'bg-card-bg dark:bg-zinc-800 border-card-border hover:border-btn-primary hover:shadow-md'
+                                ? 'bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/40' 
+                                : 'bg-info-card-bg border-info-border hover:border-btn-primary hover:shadow-md'
                             }`}
                           >
                             <div className="flex justify-between items-start mb-3">
@@ -1054,7 +1310,7 @@ export default function App() {
                     </div>
 
                     {/* Cart */}
-                    <div className="flex-1 bg-badge-bg rounded-3xl p-6 flex flex-col border border-input-border">
+                    <div className="flex-1 bg-info-card-bg rounded-3xl p-6 flex flex-col border border-info-border">
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="font-bold text-lg flex items-center gap-2">
                           Cart <span className="text-sm font-normal text-text-secondary">({cart.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
@@ -1080,7 +1336,7 @@ export default function App() {
                               key={item.id}
                               initial={{ opacity: 0, x: 10 }}
                               animate={{ opacity: 1, x: 0 }}
-                              className="bg-white dark:bg-zinc-800 p-4 rounded-xl border border-input-border flex items-center justify-between shadow-sm"
+                              className="bg-card-bg dark:bg-card-bg p-4 rounded-xl border border-card-border flex items-center justify-between shadow-sm"
                             >
                               <div className="flex-1">
                                 <h4 className="text-sm font-semibold text-login-text">{item.name}</h4>
@@ -1183,7 +1439,7 @@ export default function App() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {isLoading ? (
                       [1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                        <div key={i} className="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-input-border animate-pulse">
+                        <div key={i} className="bg-info-card-bg rounded-2xl p-6 border border-info-border animate-pulse">
                           <div className="h-4 w-20 bg-badge-bg rounded-full mb-4"></div>
                           <div className="h-6 w-32 bg-badge-bg rounded-md mb-2"></div>
                           <div className="h-8 w-24 bg-badge-bg rounded-md mb-4"></div>
@@ -1201,10 +1457,10 @@ export default function App() {
                             animate={{ opacity: 1, scale: 1 }}
                             whileHover={{ y: -4 }}
                             onClick={() => setEditingProduct(product)}
-                            className={`bg-card-bg dark:bg-zinc-800 rounded-2xl p-6 border transition-all cursor-pointer group relative ${
+                            className={`bg-info-card-bg rounded-2xl p-6 border transition-all cursor-pointer group relative ${
                               isLowStock 
-                                ? 'border-red-300 dark:border-red-900/30 bg-red-100/30' 
-                                : 'border-card-border hover:border-btn-primary hover:shadow-lg'
+                                ? 'border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30' 
+                                : 'border-info-border hover:border-btn-primary hover:shadow-lg'
                             }`}
                           >
                             <div className="flex justify-between items-start mb-4">
@@ -1271,8 +1527,8 @@ export default function App() {
                       <Plus className="w-4 h-4" /> Create PO
                     </button>
                   </div>
-                  <div className="bg-white dark:bg-zinc-800 rounded-2xl border border-input-border overflow-hidden">
-                    <div className="p-6 flex items-center justify-between border-b border-input-border">
+                  <div className="bg-info-card-bg rounded-2xl border border-info-border overflow-hidden">
+                    <div className="p-6 flex items-center justify-between border-b border-info-border">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-badge-bg rounded-xl flex items-center justify-center">
                           <Truck className="w-6 h-6 text-btn-primary" />
@@ -1310,7 +1566,7 @@ export default function App() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {users.map(user => (
-                      <div key={user.id} className="bg-card-bg dark:bg-zinc-800 rounded-2xl p-6 border border-card-border shadow-sm">
+                      <div key={user.id} className="bg-info-card-bg rounded-2xl p-6 border border-info-border shadow-sm">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-badge-bg rounded-2xl flex items-center justify-center">
@@ -1360,7 +1616,7 @@ export default function App() {
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div className="bg-card-bg dark:bg-zinc-800 rounded-2xl p-6 border border-card-border">
+                    <div className="bg-info-card-bg rounded-2xl p-6 border border-info-border">
                       <span className="bg-badge-bg px-2.5 py-1 rounded-lg text-[10px] text-badge-color uppercase tracking-widest font-bold">Weekly Sales</span>
                       <div className="text-4xl font-black text-login-text my-4">$3,270</div>
                       <button onClick={() => showToast('PDF downloaded')} className="w-full bg-badge-bg text-text-secondary py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-input-border transition-colors">
@@ -1387,12 +1643,12 @@ export default function App() {
                     </button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="bg-card-bg dark:bg-zinc-800 rounded-2xl p-6 border border-card-border shadow-sm">
+                    <div className="bg-info-card-bg rounded-2xl p-6 border border-info-border shadow-sm">
                       <div className="flex justify-between items-start mb-4">
                         <div className="w-12 h-12 bg-badge-bg rounded-xl flex items-center justify-center">
                           <UserCircle className="w-8 h-8 text-btn-primary" />
                         </div>
-                        <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-[10px] font-bold uppercase">Outstanding</span>
+                        <span className="bg-red-100 dark:bg-red-900/30 text-red-600 px-2 py-1 rounded text-[10px] font-bold uppercase">Outstanding</span>
                       </div>
                       <h3 className="font-bold text-lg text-login-text mb-1">Juan Dela Cruz</h3>
                       <div className="text-2xl font-black text-red-500 mb-4">$150.00</div>
