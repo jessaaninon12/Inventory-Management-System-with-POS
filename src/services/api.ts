@@ -1,39 +1,39 @@
-/**
- * API Service Layer
- * Prepared for connection with Django Backend
- */
+import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// This is the base URL for your Django backend.
+// In development, you might use 'http://localhost:8000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-export const api = {
-  get: async (endpoint: string) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`);
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
   },
-  post: async (endpoint: string, data: any) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  },
-  put: async (endpoint: string, data: any) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  },
-  delete: async (endpoint: string) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  },
+});
+
+// Add interceptors if needed (e.g., for JWT tokens from Django)
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const authService = {
+  login: (credentials: any) => api.post('/auth/login/', credentials),
+  register: (userData: any) => api.post('/auth/register/', userData),
 };
+
+export const productService = {
+  getProducts: () => api.get('/products/'),
+  createProduct: (productData: any) => api.post('/products/', productData),
+  updateProduct: (id: number, productData: any) => api.put(`/products/${id}/`, productData),
+  deleteProduct: (id: number) => api.delete(`/products/${id}/`),
+};
+
+export const salesService = {
+  getSales: () => api.get('/sales/'),
+};
+
+export default api;

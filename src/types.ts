@@ -1,32 +1,28 @@
-export type Section = 'dashboard' | 'pos' | 'inventory' | 'stock' | 'users' | 'reports' | 'cd';
-
-export interface Product {
-  id: string;
+export interface User {
+  id: number;
   name: string;
-  price: number;
-  stock: number;
-  category: string;
-  lowStockThreshold?: number;
+  email: string;
 }
 
-export interface CartItem extends Product {
-  quantity: number;
+export interface Product {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  cost: number;
+  stock: number;
+  unit: string;
+  description: string;
+  low_stock_threshold: number;
+  image_url?: string;
 }
 
 export interface Sale {
-  id: string;
-  date: string; // ISO string with time
-  amount: number;
-  items: { productId: string; productName: string; quantity: number; price: number }[];
-}
-
-export interface User {
-  id?: string;
-  username: string;
-  firstName: string;
-  surname: string;
-  role: 'Admin' | 'Manager' | 'CEO' | 'Staff Worker';
-  email: string;
-  phone: string;
-  address: string;
+  id: number;
+  order_id: string;
+  customer_name: string;
+  date: string;
+  total: number;
+  status: 'Completed' | 'Pending' | 'Cancelled';
+  items_count: number;
 }
