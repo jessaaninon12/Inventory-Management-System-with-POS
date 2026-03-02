@@ -1,0 +1,105 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #967777;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+
+
+}
+
+img{
+    width: 50px;
+    height: auto;
+}
+/* Sidebar Styling */
+.sidebar {
+    width: 260px;
+    background-color: #371717; /* The purple color from your image */
+    color: white;
+    padding: 20px;
+}
+
+.sidebar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: 0.3s;
+    border-radius: 8px;
+}
+
+.sidebar ul li:hover, .sidebar ul li.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    padding: 25px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.search-bar input {
+    padding: 10px;
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card .icon {
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+}
+
+/* Specific Card Colors */
+.revenue .icon { background: #e3f2fd; color: #1c050f; }
+.expense .icon { background: #fce4ec; color: #672e41; }
+.clients .icon { background: #fff3e0; color: #5a011c; }
+.new-store .icon { background: #e8f5e9; color: #4caf50; }
+___-
