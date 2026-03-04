@@ -152,7 +152,7 @@ REST_FRAMEWORK = {
 }
 
 # ---------------------------------------------------------------------------
-# CORS — allow the Vite frontend (port 3005) during development
+# CORS — allow the frontend during development
 # ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3005",
