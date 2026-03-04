@@ -1,7 +1,6 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Product, Sale
+from .models import Product, Sale, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -32,7 +31,7 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    username = serializers.CharField()
     password = serializers.CharField()
 
 

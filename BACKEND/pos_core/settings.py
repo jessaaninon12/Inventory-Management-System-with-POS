@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "api",
 ]
 
+AUTH_USER_MODEL = "api.User"
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -101,7 +103,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": os.environ.get("DB_NAME", "haneus_cafe_db"),
+            "NAME": os.environ.get("DB_NAME", "Haneus-Inventory"),
             "USER": os.environ.get("DB_USER", "root"),
             "PASSWORD": os.environ.get("DB_PASSWORD", ""),
             "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
@@ -150,7 +152,7 @@ REST_FRAMEWORK = {
 }
 
 # ---------------------------------------------------------------------------
-# CORS — allow the Vite frontend (port 3005) during development
+# CORS — allow the frontend during development
 # ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3005",
