@@ -1,9 +1,16 @@
 from django.contrib.auth import authenticate
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Product, Sale, User
+from .schema_serializers import (
+    AuthSuccessSchema,
+    ErrorSchema,
+    LoginRequestSchema as LoginRequestDoc,
+    RegisterRequestSchema as RegisterRequestDoc,
+)
 from .serializers import (
     LoginSerializer,
     ProductSerializer,
@@ -19,6 +26,11 @@ from .serializers import (
 class RegisterView(APIView):
     """POST /api/auth/register/ — create a new user account."""
 
+    @extend_schema(
+        tags=["Auth"],
+        request=RegisterRequestDoc,
+        responses={201: AuthSuccessSchema, 400: ErrorSchema},
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -35,6 +47,11 @@ class RegisterView(APIView):
 class LoginView(APIView):
     """POST /api/auth/login/ — authenticate and return user data."""
 
+    @extend_schema(
+        tags=["Auth"],
+        request=LoginRequestDoc,
+        responses={200: AuthSuccessSchema, 401: ErrorSchema},
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -1,12 +1,19 @@
 #!/usr/bin/env python
-"""Django management script for Haneus Cafe POS."""
+"""
+Django management script for Haneus Cafe POS — Clean Architecture.
+
+Usage:
+    python manage.py runserver
+    python manage.py makemigrations
+    python manage.py migrate
+"""
 
 import os
 import sys
 
 
 def main():
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pos_core.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

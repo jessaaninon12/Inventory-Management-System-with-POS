@@ -1,4 +1,4 @@
-// Register page function
+// Register page functionality
 lucide.createIcons();
 
 // Form submit — POST to Django backend
@@ -9,18 +9,26 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const form = e.target;
-  const name = form.name.value.trim();
+  const first_name = form.firstName.value.trim();
+  const last_name = form.lastName.value.trim();
+  const username = form.username.value.trim();
   const email = form.email.value.trim();
-  const password = passwordInput.value;
-  const confirm = confirmInput.value;
+  const password = form.password.value;
+  const confirmPassword = form.confirmPassword.value;
 
-  if (password !== confirm) {
+  // Client-side validation
+  if (password !== confirmPassword) {
     alert("Passwords do not match!");
     return;
   }
 
   if (password.length < 6) {
     alert("Password should be at least 6 characters long.");
+    return;
+  }
+
+  if (!form.agreeTerms.checked) {
+    alert("You must agree to the Terms & Privacy to create an account.");
     return;
   }
 
@@ -31,7 +39,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     const res = await fetch(`${API_BASE}/api/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ first_name, last_name, username, email, password }),
     });
 
     const data = await res.json();
@@ -40,7 +48,16 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       alert('Account created successfully! Please log in.');
       window.location.href = 'login.html';
     } else {
-      const errorMsg = data.email?.[0] || data.detail || data.error || 'Registration failed. Please try again.';
+      // Show the first validation error found
+      const errorMsg =
+        data.username?.[0] ||
+        data.email?.[0] ||
+        data.first_name?.[0] ||
+        data.last_name?.[0] ||
+        data.password?.[0] ||
+        data.detail ||
+        data.error ||
+        'Registration failed. Please try again.';
       alert(errorMsg);
     }
   } catch (err) {
