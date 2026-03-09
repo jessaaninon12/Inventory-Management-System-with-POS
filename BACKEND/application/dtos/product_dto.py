@@ -1,0 +1,113 @@
+"""
+Product data-transfer objects used between the API, service, and infrastructure layers.
+"""
+
+
+class ProductDTO:
+    """Full representation of a product — used for read responses."""
+
+    def __init__(
+        self,
+        id=None,
+        name="",
+        category="",
+        price=0.0,
+        cost=0.0,
+        stock=0,
+        unit="piece",
+        description="",
+        low_stock_threshold=10,
+        image_url=None,
+        stock_status="",
+        created_at=None,
+        updated_at=None,
+    ):
+        self.id = id
+        self.name = name
+        self.category = category
+        self.price = price
+        self.cost = cost
+        self.stock = stock
+        self.unit = unit
+        self.description = description
+        self.low_stock_threshold = low_stock_threshold
+        self.image_url = image_url
+        self.stock_status = stock_status
+        self.created_at = created_at
+        self.updated_at = updated_at
+
+    @staticmethod
+    def from_entity(entity):
+        return ProductDTO(
+            id=entity.id,
+            name=entity.name,
+            category=entity.category,
+            price=entity.price,
+            cost=entity.cost,
+            stock=entity.stock,
+            unit=entity.unit,
+            description=entity.description,
+            low_stock_threshold=entity.low_stock_threshold,
+            image_url=entity.image_url,
+            stock_status=entity.stock_status,
+            created_at=entity.created_at,
+            updated_at=entity.updated_at,
+        )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "category": self.category,
+            "price": str(self.price),
+            "cost": str(self.cost),
+            "stock": self.stock,
+            "unit": self.unit,
+            "description": self.description,
+            "low_stock_threshold": self.low_stock_threshold,
+            "image_url": self.image_url,
+            "stock_status": self.stock_status,
+            "created_at": str(self.created_at) if self.created_at else None,
+            "updated_at": str(self.updated_at) if self.updated_at else None,
+        }
+
+
+class CreateProductDTO:
+    """Payload for creating a new product."""
+
+    def __init__(
+        self,
+        name,
+        category,
+        price,
+        cost=0,
+        stock=0,
+        unit="piece",
+        description="",
+        low_stock_threshold=10,
+        image_url=None,
+    ):
+        self.name = name
+        self.category = category
+        self.price = float(price)
+        self.cost = float(cost)
+        self.stock = int(stock)
+        self.unit = unit
+        self.description = description
+        self.low_stock_threshold = int(low_stock_threshold)
+        self.image_url = image_url
+
+
+class UpdateProductDTO:
+    """Payload for updating an existing product (all fields optional)."""
+
+    def __init__(self, **kwargs):
+        self.name = kwargs.get("name")
+        self.category = kwargs.get("category")
+        self.price = kwargs.get("price")
+        self.cost = kwargs.get("cost")
+        self.stock = kwargs.get("stock")
+        self.unit = kwargs.get("unit")
+        self.description = kwargs.get("description")
+        self.low_stock_threshold = kwargs.get("low_stock_threshold")
+        self.image_url = kwargs.get("image_url")
