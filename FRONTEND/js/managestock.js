@@ -188,6 +188,42 @@ window.addEventListener('click', function(event) {
   if (event.target === document.getElementById('historyModal'))     closeHistoryModal();
 });
 
+// ---------- Export CSV ----------
+function exportStockCsv() {
+  const rows = Array.from(document.querySelectorAll('#stockTableBody tr[data-product-id]'))
+    .filter(row => row.style.display !== 'none');
+  if (!rows.length) { alert('No rows to export.'); return; }
+  const header = ['Product', 'ID', 'Current Stock', 'Last Updated'];
+  const escape = (v) => {
+    const s = String(v ?? '').replace(/"/g, '""');
+    return /[",\n]/.test(s) ? `"${s}"` : s;
+  };
+  const lines = [header.join(',')];
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const product = cells[0]?.textContent?.trim() || '';
+    const id = (cells[1]?.textContent || '').replace('#','').trim();
+    const stock = cells[2]?.textContent?.trim() || '';
+    const updated = cells[4]?.textContent?.trim() || '';
+    lines.push([product, id, stock, updated].map(escape).join(','));
+  });
+  const csv = lines.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date();
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  a.href = url;
+  a.download = `inventory_stock_${y}-${m}-${d}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+document.getElementById('exportCsvBtn')?.addEventListener('click', exportStockCsv);
+
 // ---------- Init ----------
 loadProducts();
 
