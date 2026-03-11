@@ -20,9 +20,9 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 
     # ── Auth endpoints (login, register) ───────────────────────────
-    path("api/", include("api.urls")),
     # — Clean Architecture endpoints (products, orders, inventory) —
     path("api/", include("api.controllers.urls")),
+    path("api/", include("api.urls")),
 ]
 
 # Serve uploaded media files during development

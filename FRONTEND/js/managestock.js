@@ -49,7 +49,7 @@ function incrementStock(btn) {
 function decrementStock(btn) {
   const input = btn.nextElementSibling;
   const v = parseInt(input.value || 0);
-  if (v > 0) input.value = v - 1;
+  input.value = (isNaN(v) ? 0 : v) - 1;
 }
 
 // ---------- Apply / Confirm ----------
