@@ -3,6 +3,7 @@ lucide.createIcons();
 
 const API = 'http://127.0.0.1:8000/api';
 let pendingStockChange = null;
+let loadedProducts = [];
 
 // ---------- Load all products ----------
 async function loadProducts() {
@@ -11,6 +12,7 @@ async function loadProducts() {
     const res = await fetch(`${API}/products/`);
     const data = await res.json();
     const products = data.results || data;
+    loadedProducts = products;
 
     if (!products.length) {
       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No products found.</td></tr>';
@@ -186,6 +188,7 @@ document.querySelector('.search-input')?.addEventListener('input', function() {
 window.addEventListener('click', function(event) {
   if (event.target === document.getElementById('stockConfirmModal')) closeStockConfirmModal();
   if (event.target === document.getElementById('historyModal'))     closeHistoryModal();
+  if (event.target === document.getElementById('receiveStockModal')) closeReceiveStockModal();
 });
 
 // ---------- Export CSV ----------
@@ -223,6 +226,51 @@ function exportStockCsv() {
   URL.revokeObjectURL(url);
 }
 document.getElementById('exportCsvBtn')?.addEventListener('click', exportStockCsv);
+
+function openReceiveStockModal() {
+  const modal = document.getElementById('receiveStockModal');
+  const select = document.getElementById('receiveProduct');
+  select.innerHTML = loadedProducts.map(p => `<option value="${p.id}">${p.name} (#${p.id}) — ${p.stock} ${p.unit}</option>`).join('');
+  document.getElementById('receiveQuantity').value = 1;
+  document.getElementById('receiveSupplier').value = '';
+  document.getElementById('receiveNotes').value = '';
+  modal.style.display = 'flex';
+}
+function closeReceiveStockModal() {
+  document.getElementById('receiveStockModal').style.display = 'none';
+}
+document.getElementById('receiveStockBtn')?.addEventListener('click', openReceiveStockModal);
+document.getElementById('receiveStockForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const product_id = parseInt(document.getElementById('receiveProduct').value);
+  const quantity = parseInt(document.getElementById('receiveQuantity').value);
+  const supplier = document.getElementById('receiveSupplier').value.trim();
+  const notes = document.getElementById('receiveNotes').value.trim();
+  if (!product_id || !quantity || quantity <= 0) { alert('Please select a product and enter a valid quantity.'); return; }
+  try {
+    const res = await fetch(`${API}/inventory/adjust/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product_id,
+        quantity_change: quantity,
+        transaction_type: 'stock_in',
+        reference: supplier || '',
+        notes: notes || 'Received new stock',
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      alert('Receive failed: ' + JSON.stringify(err.errors || err));
+      return;
+    }
+    alert('Stock received successfully.');
+    closeReceiveStockModal();
+    loadProducts();
+  } catch (err) {
+    alert('Failed to receive stock.');
+  }
+});
 
 // ---------- Init ----------
 loadProducts();

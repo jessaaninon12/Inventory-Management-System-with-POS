@@ -49,6 +49,7 @@ function renderOrders(orders) {
     const dateStr = d ? d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' \u2022 ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '\u2014';
     const statusCls = o.status === 'Completed' ? 'status-completed' : o.status === 'Pending' ? 'status-pending' : 'status-cancelled';
     const refundBtn = o.status === 'Pending' ? `<button class="btn btn-small btn-refund" onclick="openRefundModal(${o.id})">Refund</button>` : '';
+    const completeBtn = o.status === 'Pending' ? `<button class="btn btn-small btn-edit" onclick="completeOrder(${o.id})">Complete</button>` : '';
     return `
       <tr data-order-id="${o.order_id}" data-status="${o.status.toLowerCase()}">
         <td>#${o.order_id}</td>
@@ -59,6 +60,7 @@ function renderOrders(orders) {
         <td><span class="status ${statusCls}">${o.status}</span></td>
         <td class="actions">
           <button class="btn btn-small btn-view" onclick="openOrderModal(${o.id})">View</button>
+          ${completeBtn}
           ${refundBtn}
         </td>
       </tr>`;
@@ -180,12 +182,64 @@ document.getElementById('refundForm').addEventListener('submit', async function(
   } catch (err) { alert('Failed to process refund.'); }
 });
 
+async function completeOrder(pk) {
+  if (!pk) return;
+  if (!confirm('Mark this order as Completed?')) return;
+  try {
+    const res = await fetch(`${API}/orders/${pk}/complete/`, { method: 'POST' });
+    if (!res.ok) {
+      const err = await res.json();
+      alert('Complete failed: ' + (err.error || JSON.stringify(err)));
+      return;
+    }
+    alert('Order marked as Completed.');
+    loadOrders();
+    loadAnalytics();
+  } catch (err) { alert('Failed to complete order.'); }
+}
+
 // ---------- Close modals on outside click ----------
 window.addEventListener('click', function(event) {
   if (event.target === document.getElementById('orderModal')) closeOrderModal();
   if (event.target === document.getElementById('refundModal')) closeRefundModal();
 });
 
+function exportSalesCsv() {
+  const rows = Array.from(document.querySelectorAll('#ordersTableBody tr[data-order-id]'))
+    .filter(row => row.style.display !== 'none');
+  if (!rows.length) { alert('No rows to export.'); return; }
+  const header = ['Order ID', 'Customer', 'Date/Time', 'Items', 'Total', 'Status'];
+  const escapeCell = (v) => {
+    const s = String(v ?? '').replace(/"/g, '""');
+    return /[",\n]/.test(s) ? `"${s}"` : s;
+  };
+  const lines = [header.join(',')];
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const orderId = cells[0]?.textContent?.trim() || '';
+    const customer = cells[1]?.textContent?.trim() || '';
+    const dateTime = cells[2]?.textContent?.trim() || '';
+    const items = cells[3]?.textContent?.trim() || '';
+    const total = cells[4]?.textContent?.trim() || '';
+    const status = cells[5]?.textContent?.trim() || '';
+    lines.push([orderId, customer, dateTime, items, total, status].map(escapeCell).join(','));
+  });
+  const csv = lines.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date();
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  a.href = url;
+  a.download = `sales_${y}-${m}-${d}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+document.getElementById('exportSalesBtn')?.addEventListener('click', exportSalesCsv);
 // ---------- Init ----------
 loadAnalytics();
 loadOrders();

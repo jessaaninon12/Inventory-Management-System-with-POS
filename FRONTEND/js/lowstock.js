@@ -88,7 +88,7 @@ document.getElementById('restockForm').addEventListener('submit', async function
       body: JSON.stringify({
         product_id: currentRestockingProduct.id,
         quantity_change: quantity,
-        transaction_type: 'restock',
+        transaction_type: 'stock_in',
         reference: supplier ? `Supplier: ${supplier}` : '',
         notes: notes,
       }),
