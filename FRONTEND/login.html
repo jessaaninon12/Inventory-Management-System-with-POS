@@ -1,59 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Haneus Café — Login</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Login</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
 
-<div class="split-screen">
+<div class="container">
 
-  <!-- Left: Login Form -->
-  <div class="auth-side">
-    <div class="form-container">
-      <h1>USER LOGIN</h1>
-
-      <form id="loginForm">
-        <div class="input-group">
-          <i data-lucide="user"></i>
-          <input type="text" name="username" placeholder="Username" required autocomplete="username">
-        </div>
-
-        <div class="input-group password-wrapper">
-          <i data-lucide="lock"></i>
-          <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
-        </div>
-
-        <div class="options">
-          <label class="remember">
-            <input type="checkbox" /> Remember me
-          </label>
-          <a href="#" class="forgot">Forgot password?</a>
-        </div>
-
-        <div id="errorMsg" style="display:none; background:#fef2f2; color:#991b1b; border:1px solid #fecaca; border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.9rem; text-align:center;"></div>
-
-        <button type="submit" class="btn-login" id="loginBtn">Login</button>
-      </form>
-
-      <div class="divider"><span>OR</span></div>
-
-      <div class="signup-link">
-        Don’t have an account? <a href="register.html">Sign up here.</a>
-      </div>
-    </div>
+  <!-- LEFT SIDE -->
+  <div class="left">
+    <img src="images/coffee.png" alt="Coffee">
+    <h1></h1>
   </div>
 
-  <!-- Right: Aesthetic Panel -->
-  <div class="visual-side"></div>
+  <!-- RIGHT SIDE -->
+  <div class="right">
+    <h2>USER LOGIN</h2>
+
+    <div class="input-group">
+      <i class="fa-regular fa-user"></i>
+      <input type="text" placeholder="Username">
+    </div>
+
+    <div class="input-group">
+      <i class="fa-solid fa-lock"></i>
+      <input type="password" id="password" placeholder="Password">
+      <i class="fa-regular fa-eye" id="togglePasswordIcon" style="cursor:pointer; display:none;"></i>
+    </div>
+
+    <div class="options">
+      <label><input type="checkbox"> Remember me</label>
+    </div>
+
+    <button class="login-btn">Login</button>
+
+    <div class="register">
+      Don’t have an account? <a href="register.html">Register</a>
+    </div>
+
+  </div>
 
 </div>
 
