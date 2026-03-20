@@ -43,6 +43,7 @@
 
       <div class="nav-group">
         <div class="nav-title">Settings</div>
+        <a href="user.html" class="nav-link" style="font-size: 15px;"><i data-lucide="shield-user"></i> User Management</a>
         <a href="profile.html"        class="nav-link"><i data-lucide="user"></i> Profile</a>
         <a href="#" onclick="confirmLogout(event)" class="nav-link"><i data-lucide="log-out"></i> Logout</a>
       </div>
@@ -59,8 +60,8 @@
 
     <div class="controls">
       <input type="text" class="search-input" placeholder="Search by product name or ID..." />
-      <button class="btn btn-primary">Receive New Stock</button>
-      <button class="btn btn-outline">Export CSV</button>
+      <button id="receiveStockBtn" class="btn btn-primary">Receive New Stock</button>
+      <button id="exportCsvBtn" class="btn btn-outline">Export CSV</button>
     </div>
 
     <div class="table-container">
@@ -76,84 +77,7 @@
           </tr>
         </thead>
         <tbody id="stockTableBody">
-          <tr data-product-id="1005" data-product-name="Espresso Beans (1kg)" data-current-stock="68">
-            <td>Espresso Beans (1kg)</td>
-            <td>#1005</td>
-            <td>68 kg</td>
-            <td>
-              <div class="stock-input-group">
-                <button onclick="decrementStock(this)">-</button>
-                <input type="number" value="0" min="0" />
-                <button onclick="incrementStock(this)">+</button>
-                <button class="btn btn-primary" style="margin-left:0.75rem; padding:0.5rem 1rem;" onclick="applyStockChange('1005', 'Espresso Beans (1kg)', '68 kg')">Apply</button>
-              </div>
-            </td>
-            <td>Today, 14:22</td>
-            <td><span class="history-badge" onclick="openHistoryModal('1005', 'Espresso Beans (1kg)')">View log</span></td>
-          </tr>
-          <tr data-product-id="1004" data-product-name="Almond Milk (1L)" data-current-stock="8">
-            <td>Almond Milk (1L)</td>
-            <td>#1004</td>
-            <td class="stock-negative">8 L</td>
-            <td>
-              <div class="stock-input-group">
-                <button onclick="decrementStock(this)">-</button>
-                <input type="number" value="0" min="0" />
-                <button onclick="incrementStock(this)">+</button>
-                <button class="btn btn-primary" style="margin-left:0.75rem; padding:0.5rem 1rem;" onclick="applyStockChange('1004', 'Almond Milk (1L)', '8 L')">Apply</button>
-              </div>
-            </td>
-            <td>Yesterday, 09:15</td>
-            <td><span class="history-badge" onclick="openHistoryModal('1004', 'Almond Milk (1L)')">View log</span></td>
-          </tr>
-          <tr data-product-id="1002" data-product-name="Caramel Latte (ready-to-serve)" data-current-stock="142">
-            <td>Caramel Latte (ready-to-serve)</td>
-            <td>#1002</td>
-            <td class="stock-positive">142</td>
-            <td>
-              <div class="stock-input-group">
-                <button onclick="decrementStock(this)">-</button>
-                <input type="number" value="0" min="0" />
-                <button onclick="incrementStock(this)">+</button>
-                <button class="btn btn-primary" style="margin-left:0.75rem; padding:0.5rem 1rem;" onclick="applyStockChange('1002', 'Caramel Latte (ready-to-serve)', '142')">Apply</button>
-              </div>
-            </td>
-            <td>2 hours ago</td>
-            <td><span class="history-badge" onclick="openHistoryModal('1002', 'Caramel Latte (ready-to-serve)')">View log</span></td>
-          </tr>
-          <tr data-product-id="1018" data-product-name="Whipped Cream Can (400g)" data-current-stock="6">
-            <td>Whipped Cream Can (400g)</td>
-            <td>#1018</td>
-            <td class="stock-negative">6 cans</td>
-            <td>
-              <div class="stock-input-group">
-                <button onclick="decrementStock(this)">-</button>
-                <input type="number" value="0" min="0" />
-                <button onclick="incrementStock(this)">+</button>
-                <button class="btn btn-primary" style="margin-left:0.75rem; padding:0.5rem 1rem;" onclick="applyStockChange('1018', 'Whipped Cream Can (400g)', '6 cans')">Apply</button>
-              </div>
-            </td>
-            <td>3 days ago</td>
-            <td><span class="history-badge" onclick="openHistoryModal('1018', 'Whipped Cream Can (400g)')">View log</span></td>
-          </tr>
-        </tbody>
-          </tr>
-          <tr>
-            <td>Whipped Cream Can (400g)</td>
-            <td>#1018</td>
-            <td class="stock-negative">6 cans</td>
-            <td>
-              <div class="stock-input-group">
-                <button onclick="this.nextElementSibling.value = parseInt(this.nextElementSibling.value) - 1 || 0">-</button>
-                <input type="number" value="0" min="0" />
-                <button onclick="this.previousElementSibling.value = parseInt(this.previousElementSibling.value) + 1">+</button>
-                <button class="btn btn-primary" style="margin-left:0.75rem; padding:0.5rem 1rem;">Apply</button>
-              </div>
-            </td>
-            <td>3 days ago</td>
-            <td><span class="history-badge">View log</span></td>
-          </tr>
-          <!-- Add more rows as needed -->
+          <tr><td colspan="6" style="text-align:center;color:var(--mocha);">Loading products...</td></tr>
         </tbody>
       </table>
     </div>
@@ -188,12 +112,36 @@
   </div>
 </div>
 
-  <script src="js/managestock.js"></script>  <script>
-    function confirmLogout(event) {
-      event.preventDefault();
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'login.html';
-      }
-    }
-  </script></body>
+<!-- receive stock modal -->
+<div id="receiveStockModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
+  <div style="background:white; border-radius:8px; padding:2rem; width:90%; max-width:520px;">
+    <h2>Receive New Stock</h2>
+    <form id="receiveStockForm" style="margin-top:1rem;">
+      <div style="margin-bottom:1rem;">
+        <label style="display:block; margin-bottom:0.25rem;">Product</label>
+        <select id="receiveProduct" required style="width:100%; padding:0.5rem; border:1px solid #ddd; border-radius:4px;"></select>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block; margin-bottom:0.25rem;">Quantity</label>
+        <input id="receiveQuantity" type="number" min="1" value="1" required style="width:100%; padding:0.5rem; border:1px solid #ddd; border-radius:4px;" />
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block; margin-bottom:0.25rem;">Supplier / Reference (optional)</label>
+        <input id="receiveSupplier" type="text" placeholder="Supplier name or reference" style="width:100%; padding:0.5rem; border:1px solid #ddd; border-radius:4px;" />
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block; margin-bottom:0.25rem;">Notes (optional)</label>
+        <textarea id="receiveNotes" rows="3" style="width:100%; padding:0.5rem; border:1px solid #ddd; border-radius:4px;"></textarea>
+      </div>
+      <div style="display:flex; gap:1rem; justify-content:flex-end; margin-top:1rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeReceiveStockModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Receive</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <script src="js/logout-modal.js"></script>
+  <script src="js/managestock.js"></script>
+</body>
 </html>

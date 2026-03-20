@@ -42,6 +42,7 @@
 
       <div class="nav-group">
         <div class="nav-title">Settings</div>
+        <a href="user.html" class="nav-link" style="font-size: 15px;"><i data-lucide="shield-user"></i> User Management</a>
         <a href="profile.html"        class="nav-link"><i data-lucide="user"></i> Profile</a>
         <a href="#" onclick="confirmLogout(event)" class="nav-link"><i data-lucide="log-out"></i> Logout</a>
       </div>
@@ -70,11 +71,11 @@
             <label for="category">Category *</label>
             <select id="category" required>
               <option value="">Select category</option>
-              <option value="beverages">Beverages</option>
-              <option value="desserts">Desserts</option>
-              <option value="pastries">Pastries</option>
-              <option value="ingredients">Ingredients / Supplies</option>
-              <option value="merch">Merchandise</option>
+              <option value="Beverages">Beverages</option>
+              <option value="Desserts">Desserts</option>
+              <option value="Pastries">Pastries</option>
+              <option value="Ingredients">Ingredients / Supplies</option>
+              <option value="Merchandise">Merchandise</option>
             </select>
           </div>
 
@@ -143,12 +144,7 @@
 
 </div>
 
-<script src="js/createproduct.js"></script>  <script>
-    function confirmLogout(event) {
-      event.preventDefault();
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'login.html';
-      }
-    }
-  </script></body>
+<script src="js/logout-modal.js"></script>
+<script src="js/createproduct.js"></script>
+</body>
 </html>

@@ -39,6 +39,7 @@
         </div>
         <div style="margin-bottom:1.5rem;">
           <p class="sidebar-section-title">Pages</p>
+          <a href="user.html" class="sidebar-link " style="font-size: 13px;"><i data-lucide="shield-user"></i> User Management</a>
           <a href="profile.html" class="sidebar-link"><i data-lucide="user"></i>Profile</a>
         </div>
         <div style="margin-bottom:1.5rem;">
@@ -74,11 +75,11 @@
       <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem; @media(min-width:768px){flex-direction:row;align-items:center;justify-content:space-between;}">
         <div>
           <h1>Welcome, Admin</h1>
-          <p style="color:var(--mocha); margin-top:0.25rem;">You have 200+ Orders, Today</p>
+          <p id="orders-today" style="color:var(--mocha); margin-top:0.25rem;">Loading...</p>
         </div>
         <div style="display:flex;align-items:center;gap:0.75rem;background:white;padding:0.625rem 1rem;border-radius:0.5rem;border:1px solid var(--latte);box-shadow:0 2px 6px rgba(0,0,0,0.06);white-space:nowrap;">
           <i data-lucide="calendar" style="color:rgba(110,79,62,0.8);width:20px;height:20px;"></i>
-          <span style="font-size:0.875rem;font-weight:500;">01 Jan 2024 – 07 Jan 2024</span>
+          <span id="date-range" style="font-size:0.875rem;font-weight:500;"></span>
         </div>
       </div>
 
@@ -86,17 +87,17 @@
       <div class="grid-1-2-3" style="margin-bottom:2rem;">
         <div class="card card-primary">
           <p style="opacity:0.9;font-size:0.875rem;">Total Sales</p>
-          <div class="stat-value">$48,988,078</div>
+          <div id="total-sales" class="stat-value">$0</div>
           <i data-lucide="trending-up" style="font-size:2.5rem;opacity:0.8;float:right;"></i>
         </div>
         <div class="card card-mocha">
           <p style="opacity:0.9;font-size:0.875rem;">Total Sales Return</p>
-          <div class="stat-value">$16,478,145</div>
+          <div id="total-sales-returns" class="stat-value">$0</div>
           <i data-lucide="trending-down" style="font-size:2.5rem;opacity:0.8;float:right;"></i>
         </div>
         <div class="card card-cappuccino">
           <p style="opacity:0.9;font-size:0.875rem;">Total Products</p>
-          <div class="stat-value">$24,145,789</div>
+          <div id="total-products" class="stat-value">0</div>
           <i data-lucide="box" style="font-size:2.5rem;opacity:0.8;float:right;"></i>
         </div>
       </div>
@@ -104,26 +105,26 @@
       <!-- ubos stats -->
       <div class="grid-1-2-3" style="margin-bottom:2rem;">
         <div class="card">
-          <div class="stat-value">$32,450</div>
+          <div id="profit" class="stat-value">$0</div>
           <p style="color:var(--mocha);">Profit</p>
           <div style="margin-top:0.75rem;display:flex;gap:0.5rem;font-size:0.75rem;">
-            <span style="color:#15803d;font-weight:500;">+12.5%</span>
+            <span id="profit-change" style="font-weight:500;">0%</span>
             <span style="color:var(--mocha);">vs last week</span>
           </div>
         </div>
         <div class="card">
-          <div class="stat-value">$12,340</div>
+          <div id="total-expenses" class="stat-value">$0</div>
           <p style="color:var(--mocha);">Total Expenses</p>
           <div style="margin-top:0.75rem;display:flex;gap:0.5rem;font-size:0.75rem;">
-            <span style="color:#b91c1c;font-weight:500;">+4.8%</span>
+            <span id="expenses-change" style="font-weight:500;">0%</span>
             <span style="color:var(--mocha);">vs last week</span>
           </div>
         </div>
         <div class="card">
-          <div class="stat-value">$5,670</div>
+          <div id="total-payment-returns" class="stat-value">$0</div>
           <p style="color:var(--mocha);">Total Payment Returns</p>
           <div style="margin-top:0.75rem;display:flex;gap:0.5rem;font-size:0.75rem;">
-            <span style="color:#15803d;font-weight:500;">+9.1%</span>
+            <span id="returns-change" style="font-weight:500;">0%</span>
             <span style="color:var(--mocha);">vs last week</span>
           </div>
         </div>
@@ -143,19 +144,19 @@
               <button class="period-btn active">1Y</button>
             </div>
           </div>
-          <div class="bar-chart">
-            <div class="bar" style="height:40%;"></div>
-            <div class="bar" style="height:32%;"></div>
-            <div class="bar" style="height:52%;"></div>
-            <div class="bar" style="height:44%;"></div>
-            <div class="bar" style="height:48%;"></div>
-            <div class="bar" style="height:60%;"></div>
-            <div class="bar" style="height:54%;"></div>
-            <div class="bar" style="height:38%;"></div>
-            <div class="bar" style="height:46%;"></div>
-            <div class="bar" style="height:58%;"></div>
-            <div class="bar" style="height:68%;"></div>
-            <div class="bar" style="height:50%;"></div>
+          <div id="bar-chart" class="bar-chart">
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
+            <div class="bar" style="height:5%;"></div>
           </div>
           <div class="month-labels">
             <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
@@ -169,28 +170,8 @@
           <h3 style="font-weight:600; font-size:1.125rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
             <span style="font-size:1.25rem;">🏆</span> Top Selling
           </h3>
-          <div style="display:flex; flex-direction:column; gap:1.25rem;">
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:0.875rem; margin-bottom:0.375rem;">
-                <span>Liboog</span>
-                <span style="font-weight:500;">$480</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:85%;"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:0.875rem; margin-bottom:0.375rem;">
-                <span>Pale Pilsen</span>
-                <span style="font-weight:500;">$372</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:66%;"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:0.875rem; margin-bottom:0.375rem;">
-                <span>Century Tuna</span>
-                <span style="font-weight:500;">$270</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:48%;"></div></div>
-            </div>
+          <div id="top-selling-list" style="display:flex; flex-direction:column; gap:1.25rem;">
+            <p style="opacity:0.7;font-size:0.875rem;">Loading...</p>
           </div>
           <button style="margin-top:1.5rem; width:100%; padding:0.625rem; background:rgba(225,200,178,0.1); color:var(--latte); border:1px solid rgba(225,200,178,0.3); border-radius:0.5rem; font-weight:500; cursor:pointer;">
             View All Products
@@ -203,28 +184,15 @@
 
         <div class="card">
           <h3 style="font-weight:600; font-size:1.125rem; margin-bottom:1.25rem;">Low Stock Products</h3>
-          <div class="product-item">
-            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=100" alt="Almond Milk" style="width:56px;height:56px;object-fit:cover;border-radius:0.5rem;" />
-            <div style="flex:1;">
-              <p style="font-weight:500;">Almond Milk</p>
-              <p style="font-size:0.875rem;color:var(--mocha);">ID: #2941</p>
-            </div>
-            <span style="color:#b91c1c;font-weight:500;">8 left</span>
+          <div id="low-stock-list">
+            <p style="color:var(--mocha);font-size:0.875rem;">Loading...</p>
           </div>
         </div>
 
         <div class="card">
           <h3 style="font-weight:600; font-size:1.125rem; margin-bottom:1.25rem;">Recent Sales</h3>
-          <div class="product-item">
-            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=100" alt="Latte" style="width:56px;height:56px;object-fit:cover;border-radius:0.5rem;" />
-            <div style="flex:1;">
-              <p style="font-weight:500;">Latte</p>
-              <p style="font-size:0.875rem;color:var(--mocha);">Beverages</p>
-            </div>
-            <div style="text-align:right;">
-              <p style="font-weight:500;">$4.80</p>
-              <span style="font-size:0.75rem;background:#fef3c7;color:#92400e;padding:0.125rem 0.5rem;border-radius:999px;">Processing</span>
-            </div>
+          <div id="recent-sales-list">
+            <p style="color:var(--mocha);font-size:0.875rem;">Loading...</p>
           </div>
         </div>
 
@@ -234,14 +202,7 @@
   </div>
 </div>
 
+  <script src="js/logout-modal.js"></script>
   <script src="js/dashboard.js"></script>
-  <script>
-    function confirmLogout(event) {
-      event.preventDefault();
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'login.html';
-      }
-    }
-  </script>
 </body>
 </html>

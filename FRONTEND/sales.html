@@ -43,6 +43,7 @@
 
       <div class="nav-group">
         <div class="nav-title">Settings</div>
+        <a href="user.html" class="nav-link" style="font-size: 15px;"><i data-lucide="shield-user"></i> User Management</a>
         <a href="profile.html"        class="nav-link"><i data-lucide="user"></i> Profile</a>
         <a href="#" onclick="confirmLogout(event)" class="nav-link"><i data-lucide="log-out"></i> Logout</a>
       </div>
@@ -59,19 +60,19 @@
     <div class="summary-cards">
       <div class="summary-card">
         <div class="summary-label">Today's Sales</div>
-        <div class="summary-value">₱12,840</div>
+        <div class="summary-value" id="salesToday">₱0</div>
       </div>
       <div class="summary-card">
         <div class="summary-label">This Week</div>
-        <div class="summary-value">₱78,920</div>
+        <div class="summary-value" id="salesWeek">₱0</div>
       </div>
       <div class="summary-card">
         <div class="summary-label">Pending Orders</div>
-        <div class="summary-value">14</div>
+        <div class="summary-value" id="pendingOrders">0</div>
       </div>
       <div class="summary-card">
         <div class="summary-label">Average Order</div>
-        <div class="summary-value">₱285</div>
+        <div class="summary-value" id="avgOrder">₱0</div>
       </div>
     </div>
 
@@ -89,7 +90,7 @@
         <option>This Month</option>
         <option>Custom Range</option>
       </select>
-      <button class="btn btn-primary">Export Sales</button>
+      <button id="exportSalesBtn" class="btn btn-primary">Export Sales</button>
     </div>
 
     <div class="table-container">
@@ -106,51 +107,7 @@
           </tr>
         </thead>
         <tbody id="ordersTableBody">
-          <tr data-order-id="ORD-20260301-047" data-customer="Juan Dela Cruz" data-status="completed">
-            <td>#ORD-20260301-047</td>
-            <td>Juan Dela Cruz</td>
-            <td>Mar 01, 2026 • 19:45</td>
-            <td>3 items</td>
-            <td class="amount">₱385.00</td>
-            <td><span class="status status-completed">Completed</span></td>
-            <td class="actions">
-              <button class="btn btn-small btn-view" onclick="openOrderModal('ORD-20260301-047', 'Juan Dela Cruz', '385.00', 'completed', ['Espresso x2', 'Caramel Latte x1'])">View</button>
-            </td>
-          </tr>
-          <tr data-order-id="ORD-20260301-046" data-customer="Maria Santos" data-status="pending">
-            <td>#ORD-20260301-046</td>
-            <td>Maria Santos</td>
-            <td>Mar 01, 2026 • 18:12</td>
-            <td>5 items</td>
-            <td class="amount">₱720.00</td>
-            <td><span class="status status-pending">Pending</span></td>
-            <td class="actions">
-              <button class="btn btn-small btn-view" onclick="openOrderModal('ORD-20260301-046', 'Maria Santos', '720.00', 'pending', ['Cappuccino x2', 'Blueberry Cheesecake x2', 'Croissant x1'])">View</button>
-              <button class="btn btn-small btn-refund" onclick="openRefundModal('ORD-20260301-046', 'Maria Santos', '720.00')">Refund</button>
-            </td>
-          </tr>
-          <tr data-order-id="ORD-20260301-045" data-customer="Pedro Reyes" data-status="completed">
-            <td>#ORD-20260301-045</td>
-            <td>Pedro Reyes</td>
-            <td>Mar 01, 2026 • 17:30</td>
-            <td>2 items</td>
-            <td class="amount">₱190.00</td>
-            <td><span class="status status-completed">Completed</span></td>
-            <td class="actions">
-              <button class="btn btn-small btn-view" onclick="openOrderModal('ORD-20260301-045', 'Pedro Reyes', '190.00', 'completed', ['Iced Latte x1', 'Chocolate Cake x1'])">View</button>
-            </td>
-          </tr>
-          <tr data-order-id="ORD-20260301-044" data-customer="Anna Lim" data-status="cancelled">
-            <td>#ORD-20260301-044</td>
-            <td>Anna Lim</td>
-            <td>Mar 01, 2026 • 15:55</td>
-            <td>4 items</td>
-            <td class="amount">₱520.00</td>
-            <td><span class="status status-cancelled">Cancelled</span></td>
-            <td class="actions">
-              <button class="btn btn-small btn-view" onclick="openOrderModal('ORD-20260301-044', 'Anna Lim', '520.00', 'cancelled', ['Latte x2', 'Pastry x2'])">View</button>
-            </td>
-          </tr>
+          <tr><td colspan="7" style="text-align:center;color:var(--mocha);">Loading orders...</td></tr>
         </tbody>
       </table>
     </div>
@@ -202,14 +159,7 @@
   </div>
 </div>
 
+  <script src="js/logout-modal.js"></script>
   <script src="js/sales.js"></script>
-  <script>
-    function confirmLogout(event) {
-      event.preventDefault();
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'login.html';
-      }
-    }
-  </script>
 </body>
 </html>
