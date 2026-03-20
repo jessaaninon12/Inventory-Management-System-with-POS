@@ -159,7 +159,7 @@ h1      { font-size: 1.6rem; margin-bottom: 0.25rem; }
 }
 
 .filter-btn.active {
-  background: var(--primary);
+  background: #9A8C3A;
   color: white;
 }
 
@@ -226,7 +226,7 @@ tr:hover { background: rgba(225,200,178,0.08); }
 
 .btn svg { width: 14px; height: 14px; }
 
-.btn-primary  { background: var(--primary);  color: white; padding: 0.625rem 1.25rem; font-size: 0.875rem; }
+.btn-primary  { background: #9A8C3A;  color: white; padding: 0.625rem 1.25rem; font-size: 0.875rem; }
 .btn-primary:hover  { background: var(--primary-dark); }
 
 .btn-outline  { background: white; border: 1px solid var(--latte); color: var(--espresso); padding: 0.625rem 1.25rem; font-size: 0.875rem; }
@@ -385,7 +385,6 @@ textarea { resize: vertical; }
   gap: 1rem;
 }
 
-.detail-item {}
 .detail-label { font-size: 0.75rem; font-weight: 600; color: var(--mocha); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.2rem; }
 .detail-value { font-size: 0.95rem; color: var(--espresso); word-break: break-word; }
 

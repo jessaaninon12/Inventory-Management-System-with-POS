@@ -43,7 +43,7 @@
 
       <div class="nav-group admin-only">
         <div class="nav-title">Users</div>
-        <a href="UserManagement.html" class="nav-link sidebar-active"><i data-lucide="users"></i> User Management</a>
+        <a href="UserManagement.html" class="nav-link sidebar-active" style="font-size: 14px;"><i data-lucide="shield-user"></i> User Management</a>
       </div>
 
       <div class="nav-group">
@@ -62,6 +62,7 @@
         <h1>User Management</h1>
         <div class="subtitle">Manage Admin and Staff accounts</div>
       </div>
+      
       <button class="btn btn-primary" onclick="openCreateModal()">
         <i data-lucide="user-plus"></i> Add User
       </button>
@@ -71,7 +72,7 @@
     <div class="toolbar">
       <div class="search-wrap">
         <i data-lucide="search" class="search-icon"></i>
-        <input type="text" id="searchInput" class="search-input" placeholder="Search by username, email or type…" oninput="applyFilter()"/>
+        <input type="text" id="searchInput" class="search-input" placeholder="     Search by username, email or type…" oninput="applyFilter()"/>
       </div>
       <div class="filter-group">
         <button class="filter-btn active" data-type="all"   onclick="setFilter('all',   this)">All</button>
@@ -89,12 +90,13 @@
             <th>Username</th>
             <th>Full Name</th>
             <th>Email</th>
+            <th>Phone</th>
             <th>Type</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody id="userTableBody">
-          <tr><td colspan="6" class="empty-cell">Loading users…</td></tr>
+          <tr><td colspan="8" class="empty-cell">Loading users…</td></tr>
         </tbody>
       </table>
     </div>
