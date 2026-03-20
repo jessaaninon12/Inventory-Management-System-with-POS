@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile - Haneus Cafe Admin</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <aside>
+    <div class="sidebar-inner">
+      <div class="logo">Haneus Cafe</div>
+
+      <div class="nav-group">
+        <div class="nav-title">Main</div>
+        <a href="dashboard.html" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Inventory</div>
+        <a href="products.html"       class="nav-link"><i data-lucide="box"></i> Products</a>
+        <a href="createproduct.html" class="nav-link"><i data-lucide="plus-square"></i> Create Product</a>
+        <a href="lowstock.html"     class="nav-link"><i data-lucide="alert-triangle"></i> Low Stocks</a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Stock</div>
+        <a href="managestock.html"   class="nav-link"><i data-lucide="package"></i> Manage Stock</a>
+        <a href="#" class="nav-link"><i data-lucide="truck"></i> Supplier</a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Sales</div>
+        <a href="sales.html" class="nav-link"><i data-lucide="dollar-sign"></i> Sales</a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Settings</div>
+        <a href="user.html" class="nav-link" style="font-size: 15px;"><i data-lucide="shield-user"></i> User Management</a>
+        <a href="profile.html"        class="nav-link sidebar-active"><i data-lucide="user"></i> Profile</a>
+        <a href="#" onclick="confirmLogout(event)" class="nav-link"><i data-lucide="log-out"></i> Logout</a>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+
+    <header>
+      <h1>My Profile</h1>
+      <div class="subtitle">Manage your account details, avatar, and security settings</div>
+      <div id="profileAlert" style="display:none;padding:0.75rem 1rem;border-radius:0.5rem;margin-top:1rem;font-size:0.875rem;"></div>
+    </header>
+
+    <div class="profile-container">
+
+      <div class="profile-header">
+        <div class="avatar-upload">
+          <img src="https://static.vecteezy.com/system/resources/previews/014/194/215/original/avatar-icon-human-a-person-s-badge-social-media-profile-symbol-the-symbol-of-a-person-vector.jpg" alt="Profile" class="avatar-large" id="avatarPreview">
+          <div class="avatar-overlay">Change</div>
+          <input type="file" id="avatarInput" accept="image/*">
+        </div>
+
+        <div class="profile-info">
+          <h2 id="profileDisplayName">Loading...</h2>
+          <p>Admin • Haneus Cafe Owner</p>
+          <p id="profileJoined" style="margin-top:0.5rem;"></p>
+        </div>
+      </div>
+
+      <div class="section-title">Personal Information</div>
+
+      <form id="profileForm">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="firstName" value="" placeholder="First name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" value="" placeholder="Last name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" value="" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" value="" placeholder="+63 917 123 4567">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="bio">Short Bio / Role Description</label>
+            <textarea id="bio" rows="3" placeholder="Short bio or role description..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+
+      <div class="section-title">Change Password</div>
+
+      <form id="passwordForm">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" id="currentPassword" required>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" required>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" required>
+          </div>
+
+          <div class="form-group full-width">
+            <div class="security-note">
+              Password must be at least 8 characters, include uppercase, lowercase, number, and special character.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </div>
+      </form>
+
+      <div class="section-title">Account Actions</div>
+
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <button class="btn btn-danger">Delete Account</button>
+        <button class="btn btn-outline">Log Out from All Devices</button>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="js/logout-modal.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>
