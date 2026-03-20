@@ -2,13 +2,15 @@
 django>=4.2,<5.0
 djangorestframework>=3.14
 django-cors-headers>=4.3
+python-dotenv>=1.0
 
-# Database drivers — install the one you need:
-# For XAMPP (MySQL):
-#   pip install mysqlclient
-# For SSMS (SQL Server):
-#   pip install mssql-django pyodbc
+# API Documentation
+drf-spectacular>=0.27
 
-# Optional: for testing the DB connection utility
-# pyodbc        (only if using SQL Server)
-# mysqlclient   (only if using MySQL / XAMPP)
+# Image processing
+Pillow>=10.0
+
+# Database drivers — install the one matching your DB_ENGINE:
+# MySQL (XAMPP):   pip install mysqlclient
+# PostgreSQL:      pip install psycopg2-binary
+# SQL Server:      pip install mssql-django pyodbc

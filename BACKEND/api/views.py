@@ -1,64 +1,20 @@
-from django.contrib.auth import authenticate
+import os
+import uuid
+
+from django.conf import settings
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Product, Sale, User
-from .serializers import (
-    LoginSerializer,
-    ProductSerializer,
-    RegisterSerializer,
-    SaleSerializer,
-    UserSerializer,
-)
+from .models import Product, Sale
+from .schema_serializers import ErrorSchema
+from .product_serializers import ProductSerializer, SaleSerializer
 
 
 # ---------------------------------------------------------------------------
-# Auth Views
-# ---------------------------------------------------------------------------
-class RegisterView(APIView):
-    """POST /api/auth/register/ — create a new user account."""
-
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(
-            {
-                "success": True,
-                "user": UserSerializer(user).data,
-            },
-            status=status.HTTP_201_CREATED,
-        )
-
-
-class LoginView(APIView):
-    """POST /api/auth/login/ — authenticate and return user data."""
-
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        username = serializer.validated_data["username"]
-        password = serializer.validated_data["password"]
-
-        user = authenticate(username=username, password=password)
-        if user is None:
-            return Response(
-                {"error": "Invalid username or password."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        return Response(
-            {
-                "success": True,
-                "user": UserSerializer(user).data,
-            }
-        )
-
-
-# ---------------------------------------------------------------------------
-# Product CRUD Views
+# Product CRUD Views (legacy — api.models.Product / api_product table)
 # ---------------------------------------------------------------------------
 class ProductListCreateView(generics.ListCreateAPIView):
     """
@@ -82,8 +38,42 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 # ---------------------------------------------------------------------------
-# Sale CRUD Views
+# Image Upload
 # ---------------------------------------------------------------------------
+class ImageUploadView(APIView):
+    """POST /api/upload/ — upload an image file, returns its served URL."""
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(tags=["Uploads"], request=None, responses={201: None, 400: ErrorSchema})
+    def post(self, request):
+        file = request.FILES.get("file")
+        if not file:
+            return Response({"error": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate image type
+        allowed = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+        ext = os.path.splitext(file.name)[1].lower()
+        if ext not in allowed:
+            return Response(
+                {"error": f"Invalid file type. Allowed: {', '.join(allowed)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Save with unique name
+        upload_dir = os.path.join(settings.MEDIA_ROOT, "uploads")
+        os.makedirs(upload_dir, exist_ok=True)
+
+        filename = f"{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join(upload_dir, filename)
+
+        with open(filepath, "wb+") as dest:
+            for chunk in file.chunks():
+                dest.write(chunk)
+
+        url = f"{settings.MEDIA_URL}uploads/{filename}"
+        return Response({"url": url}, status=status.HTTP_201_CREATED)
+
+
 class SaleListCreateView(generics.ListCreateAPIView):
     """
     GET  /api/sales/      — list all sales (newest first)
