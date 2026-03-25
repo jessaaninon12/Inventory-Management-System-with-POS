@@ -93,20 +93,24 @@
     <div class="table-container">
       <table>
         <thead>
-          <tr>
-            <th>Username</th>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Type</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+  <tr>
+    <th>Username</th>
+    <th>Full Name</th>
+    <th>Email</th>
+    <th>Role Description</th>
+    <th>Type</th>
+    <th>Actions</th>
+  </tr>
+</thead>
         <tbody id="userTableBody">
 <tr><td colspan="6" class="empty-cell">Loading users…</td></tr>
         </tbody>
       </table>
     </div>
+    <!-- After the table container -->
+<div class="pagination-container" id="paginationControls">
+  <!-- dynamically filled by JavaScript -->
+</div>
 
   </main>
 </div>
@@ -218,46 +222,6 @@
   </div>
 </div>
 
-<!-- ── PARTIAL EDIT MODAL (PATCH) ─────────────────────────────── -->
-<div id="patchModal" class="modal-overlay" style="display:none;">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h2>Quick Update <span class="badge-type" id="patchTypeBadge"></span></h2>
-      <button class="modal-close" onclick="closeModal('patchModal')"><i data-lucide="x"></i></button>
-    </div>
-    <form id="patchForm" onsubmit="submitPatch(event)">
-      <div class="modal-body">
-        <p class="patch-hint">Only fill in the fields you want to change. Empty fields will be left untouched.</p>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" id="pFirstName" placeholder="(unchanged)"/>
-          </div>
-          <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" id="pLastName" placeholder="(unchanged)"/>
-          </div>
-          <div class="form-group full-width">
-            <label>Email</label>
-            <input type="email" id="pEmail" placeholder="(unchanged)"/>
-          </div>
-          <div class="form-group">
-            <label>Phone</label>
-            <input type="tel" id="pPhone" placeholder="(unchanged)"/>
-          </div>
-          <div class="form-group full-width">
-            <label>Bio</label>
-            <textarea id="pBio" rows="3" placeholder="(unchanged)"></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeModal('patchModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Apply Changes</button>
-      </div>
-    </form>
-  </div>
-</div>
 
 <!-- ── DELETE MODAL ────────────────────────────────────────────── -->
 <div id="deleteModal" class="modal-overlay" style="display:none;">

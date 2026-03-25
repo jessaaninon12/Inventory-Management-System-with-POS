@@ -44,6 +44,22 @@
             <!-- ─ STEP 1: Personal info + account type ─ -->
             <fieldset class="wizard-step" id="step1">
 
+              <!-- Account Type (details/summary dropdown) -->
+              <div class="input-group reg-drop-wrap" id="userTypeGroup">
+                <i class="fa-solid fa-shield-halved drop-icon"></i>
+                <details class="custom-dropdown" id="userTypeDropdown">
+                  <summary>
+                    <span id="userTypeDisplay">Account Type</span>
+                    <i class="fa-solid fa-chevron-down drop-chevron"></i>
+                  </summary>
+                  <ul class="dropdown-menu">
+                    <li data-value="Admin"><i class="fa-solid fa-crown"></i> Admin</li>
+                    <li data-value="Staff"><i class="fa-solid fa-user"></i> Staff</li>
+                  </ul>
+                </details>
+                <input type="hidden" id="userType" name="userType" value="">
+              </div>
+
               <!-- First Name -->
               <div class="input-group float-group">
                 <i class="fa-regular fa-user field-icon"></i>
@@ -60,21 +76,7 @@
                 <label for="lastName">Last Name</label>
               </div>
 
-              <!-- Account Type (details/summary dropdown) -->
-              <div class="input-group reg-drop-wrap" id="userTypeGroup">
-                <i class="fa-solid fa-shield-halved drop-icon"></i>
-                <details class="custom-dropdown" id="userTypeDropdown">
-                  <summary>
-                    <span id="userTypeDisplay">Account Type</span>
-                    <i class="fa-solid fa-chevron-down drop-chevron"></i>
-                  </summary>
-                  <ul class="dropdown-menu">
-                    <li data-value="Admin"><i class="fa-solid fa-crown"></i> Admin</li>
-                    <li data-value="Staff"><i class="fa-solid fa-user"></i> Staff</li>
-                  </ul>
-                </details>
-                <input type="hidden" id="userType" name="userType" value="">
-              </div>
+              
 
               <!-- Step 1 nav -->
               <div class="step-nav">
@@ -142,7 +144,10 @@
   </div><!-- /auth-side -->
 
   <!-- Right: Aesthetic Panel -->
-  <div class="visual-side"></div>
+  <div class="left">
+    <img src="images/coffee1.png" alt="Coffee">
+    <h1></h1>
+  </div>
 
 </div><!-- /split-screen -->
 
