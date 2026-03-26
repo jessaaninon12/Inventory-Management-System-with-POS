@@ -1,6 +1,6 @@
 :root {
-  --bg-form:     #9B5C37;
-  --bg-visual:   #5D3A1F;
+  --bg-form:     #8c4f22;      /* matching login's right side */
+  --bg-visual:   #4F4410;      /* new green – matches sidebar */
   --text-light:  #FFFFFF;
   --input-bg:    #FFFFFF;
   --text-dark:   #3c2f2f;
@@ -25,6 +25,7 @@ body {
 /* ── Layout ────────────────────────────────────────────────── */
 .split-screen { display: flex; height: 100vh; }
 
+/* Left side: Sign Up Form (same background as login's right) */
 .auth-side {
   flex: 1;
   display: flex;
@@ -174,34 +175,6 @@ h1 {
 
 .float-group input:focus { outline: none; }
 
-/* ── Select Group ─────────────────────────────────────────── */
-.select-group select {
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  color: var(--text-dark);
-}
-
-.select-group select option { color: var(--text-dark); background: #fff; }
-
-.select-arrow {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 11px;
-  color: #aaa;
-  pointer-events: none;
-}
-
-/* Float select label up when group has .active class (set by JS) */
-.select-group.active label {
-  top: 7px;
-  font-size: 0.68rem;
-  color: var(--accent);
-  transform: none;
-}
-
 /* ── Password toggle ───────────────────────────────────────── */
 .toggle-pw {
   background: none;
@@ -325,23 +298,20 @@ h1 {
 
 /* ── Wizard ───────────────────────────────────────────────────── */
 .wizard-wrapper {
-  overflow: hidden;   /* clips step 2 out of view; dropdown uses position:fixed */
-  width: 100%;        /* explicit width so step percentage resolves correctly */
+  overflow: hidden;
+  width: 100%;
   padding-top: 2px;
 }
 
 .wizard-track {
   display: flex;
   flex-wrap: nowrap;
-  width: 200%;        /* exactly 2 steps wide — each step gets 50% = 100% of wrapper */
+  width: 200%;
   transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
-  /* NOTE: will-change:transform is intentionally omitted — it creates a CSS
-     containing block that traps position:fixed children (the dropdown menu)
-     inside overflow:hidden on .wizard-wrapper, making the menu invisible. */
 }
 
 .wizard-step {
-  width: 50%;         /* 50% of 200%-wide track = full wrapper width */
+  width: 50%;
   min-width: 0;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -493,6 +463,7 @@ h1 {
 .pl__ring--c { stroke: var(--bg-visual);   animation-name: ringC; }
 .pl__ring--d { stroke: var(--accent-dark); animation-name: ringD; }
 
+/* keyframes unchanged – kept for spinner animation */
 @keyframes ringA {
   from,4%  {stroke-dasharray:0 660;stroke-width:20;stroke-dashoffset:-330}
   12%      {stroke-dasharray:60 600;stroke-width:30;stroke-dashoffset:-335}
@@ -530,29 +501,37 @@ h1 {
   86%,to   {stroke-dasharray:0 440;stroke-width:20;stroke-dashoffset:-440}
 }
 
-/* ── Visual Side ────────────────────────────────────────────── */
-.visual-side {
+/* ── Right side: Image (same as login's left side) ─────────── */
+.left {
   flex: 1;
-  background: linear-gradient(135deg, #5D3A1F 0%, #8B5A34 50%, #9B5C37 100%);
+  background: var(--bg-visual);  /* now #4F4410 */
   position: relative;
-  overflow: hidden;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;  /* image to the rightmost */
+  overflow: hidden;
 }
 
-.visual-side::before {
-  content: 'HANEUS CAFE';
+.left img {
+  height: 100%;
+  object-fit: cover;
+  animation: zoom 20s infinite alternate ease-in-out;
+}
+
+@keyframes zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+.left h1 {
   position: absolute;
-  font-size: 7rem;
-  font-weight: 900;
-  color: rgba(255,255,255,0.07);
-  letter-spacing: -0.02em;
-  text-align: center;
-  white-space: nowrap;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  z-index: 1;
+  left: -120px;
+  transform: rotate(-90deg);
+  font-size: 140px;
+  font-weight: 800;
+  letter-spacing: 12px;
+  color: #f4f0e8;
+  pointer-events: none;
 }
 
 /* ── Inline field hints (username uniqueness) ──────────────── */
@@ -583,8 +562,11 @@ h1 {
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .split-screen { flex-direction: column; }
-  .visual-side  { display: none; }
-  .auth-side    { padding: 1.5rem; }
+  .left { display: none; }          /* hide image side on mobile */
+  .auth-side {
+    padding: 1.5rem;
+    background: var(--bg-form);
+  }
   .form-container { max-width: 420px; }
   body { overflow-y: auto; }
 }

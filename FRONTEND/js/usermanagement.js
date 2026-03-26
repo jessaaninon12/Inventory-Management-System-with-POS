@@ -1,13 +1,6 @@
 /* =================================================================
    UserManagement.js — Admin-only User Management page
-   Fetches Admin + Staff users, renders table, supports:
-     - live search (username, email, userType)
-     - filter by Admin / Staff
-     - Create  (POST  /api/users/{type}/create/)
-     - View    (GET   /api/users/{type}/view/<id>/)
-     - Edit    (PUT   /api/users/{type}/edit/<id>/)
-     - Delete  (DELETE/api/users/{type}/delete/<id>/)
-     - Partial (PATCH /api/users/{type}/partialedit/<id>/)
+   Fetches Admin + Staff users, renders table with pagination.
 ================================================================= */
 
 lucide.createIcons();
@@ -20,8 +13,8 @@ if (!_currentUser || !_currentUser.id) {
   window.location.href = 'login.html';
 }
 if (_currentUser.user_type !== 'Admin') {
-  alert('Access denied. This page is for Admins only.');
-  window.location.href = 'dashboard.html';
+  showErrorModal('Access denied. This page is for Admins only.');
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
 }
 
 /* Show / hide admin-only sidebar items */
@@ -33,9 +26,9 @@ document.querySelectorAll('.admin-only').forEach(el => {
 const API = 'http://127.0.0.1:8000/api';
 
 /* ── State ───────────────────────────────────────────────────────── */
-let allUsers          = [];      // combined admin + staff
-let filteredUsers     = [];      // after search + type filter
-let activeFilter      = 'all';   // 'all' | 'Admin' | 'Staff'
+let allUsers          = [];
+let filteredUsers     = [];
+let activeFilter      = 'all';
 
 let editingUserId     = null;
 let editingUserType   = null;
@@ -43,6 +36,11 @@ let deletingUserId    = null;
 let deletingUserType  = null;
 let patchingUserId    = null;
 let patchingUserType  = null;
+
+// Pagination
+let currentPage = 1;
+const itemsPerPage = 10;
+let totalPages = 1;
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
 function typeBadge(type) {
@@ -71,31 +69,88 @@ function showAlert(msg, ok = true) {
   setTimeout(() => el.remove(), 3500);
 }
 
-/* ── Fetch ───────────────────────────────────────────────────────── */
-async function loadUsers() {
-  const tbody = document.getElementById('userTableBody');
-  tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">Loading users…</td></tr>';
-  try {
-    const [adminRes, staffRes] = await Promise.all([
-      fetch(`${API}/users/admin/view/`),
-      fetch(`${API}/users/staff/view/`),
-    ]);
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
 
-    const adminData = adminRes.ok ? await adminRes.json() : [];
-    const staffData = staffRes.ok ? await staffRes.json() : [];
+function escAttr(str) {
+  return String(str || '').replace(/'/g, "\\'");
+}
 
-    /* Normalise: tag each record with user_type in case the API doesn't include it */
-    const admins = (Array.isArray(adminData) ? adminData : adminData.results || [])
-      .map(u => ({ ...u, user_type: u.user_type || 'Admin' }));
-    const staff  = (Array.isArray(staffData) ? staffData : staffData.results || [])
-      .map(u => ({ ...u, user_type: u.user_type || 'Staff' }));
+/* ── Pagination ───────────────────────────────────────────────────── */
+function updatePaginationControls() {
+  const container = document.getElementById('paginationControls');
+  if (!container) return;
 
-    allUsers = [...admins, ...staff];
-    applyFilter();
-  } catch (err) {
-    console.error('Failed to load users:', err);
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-cell" style="color:#dc2626;">Failed to load users. Is the backend running?</td></tr>';
+  if (totalPages <= 1) {
+    container.innerHTML = '';
+    return;
   }
+
+  let html = '<div class="pagination">';
+  // Previous button
+  html += `<button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹ Prev</button>`;
+
+  // Page numbers (show at most 5 pages)
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, currentPage + 2);
+  if (endPage - startPage < 4) {
+    if (startPage === 1) endPage = Math.min(totalPages, startPage + 4);
+    if (endPage === totalPages) startPage = Math.max(1, endPage - 4);
+  }
+  for (let i = startPage; i <= endPage; i++) {
+    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+  }
+
+  // Next button
+  html += `<button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next ›</button>`;
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function goToPage(page) {
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderTable();
+}
+
+/* ── Render Table (with pagination) ───────────────────────────────── */
+function renderTable() {
+  const tbody = document.getElementById('userTableBody');
+
+  if (!filteredUsers.length) {
+    tbody.innerHTML = '叭叭<td colspan="6" class="empty-cell">No users found.叭叭';
+    updatePaginationControls();
+    return;
+  }
+
+  totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageUsers = filteredUsers.slice(start, end);
+
+  tbody.innerHTML = pageUsers.map(u => `
+    <tr>
+      <td>${escHtml(fullName(u))}</td>
+      <td>${escHtml(u.username || '—')}</td>
+      <td>${escHtml(u.email || '—')}</td>
+      <td>${escHtml(u.bio || '—')}</td>
+      <td>${typeBadge(u.user_type)}</td>
+      <td class="actions">
+        <button class="btn btn-view"  onclick="openViewModal(${u.id},'${u.user_type}')">View</button>
+        <button class="btn btn-edit"  onclick="openEditModal(${u.id},'${u.user_type}')">Edit</button>
+        <button class="btn btn-danger" onclick="openDeleteModal(${u.id},'${u.user_type}','${escAttr(u.username)}')">Delete</button>
+      </td>
+    </tr>
+`).join('');
+
+  lucide.createIcons();
+  updatePaginationControls();
 }
 
 /* ── Filtering ───────────────────────────────────────────────────── */
@@ -119,52 +174,34 @@ function applyFilter() {
     return matchType && matchSearch;
   });
 
+  currentPage = 1;
   renderTable();
 }
 
-/* ── Render ──────────────────────────────────────────────────────── */
-function renderTable() {
+/* ── Fetch Users ─────────────────────────────────────────────────── */
+async function loadUsers() {
   const tbody = document.getElementById('userTableBody');
+  tbody.innerHTML = '叭叭<td colspan="6" class="empty-cell">Loading users…叭叭';
+  try {
+    const [adminRes, staffRes] = await Promise.all([
+      fetch(`${API}/users/admin/view/`),
+      fetch(`${API}/users/staff/view/`),
+    ]);
 
-  if (!filteredUsers.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">No users found.</td></tr>';
-    return;
+    const adminData = adminRes.ok ? await adminRes.json() : [];
+    const staffData = staffRes.ok ? await staffRes.json() : [];
+
+    const admins = (Array.isArray(adminData) ? adminData : adminData.results || [])
+      .map(u => ({ ...u, user_type: u.user_type || 'Admin' }));
+    const staff  = (Array.isArray(staffData) ? staffData : staffData.results || [])
+      .map(u => ({ ...u, user_type: u.user_type || 'Staff' }));
+
+    allUsers = [...admins, ...staff];
+    applyFilter();
+  } catch (err) {
+    console.error('Failed to load users:', err);
+    tbody.innerHTML = '叭叭<td colspan="6" class="empty-cell" style="color:#dc2626;">Failed to load users. Is the backend running?叭叭';
   }
-
-  tbody.innerHTML = filteredUsers.map(u => `
-    <tr>
-      <td>${escHtml(u.username || '—')}</td>
-      <td>${escHtml(fullName(u))}</td>
-      <td>${escHtml(u.email || '—')}</td>
-      <td>${escHtml(u.phone || '—')}</td>
-      <td>${typeBadge(u.user_type)}</td>
-      <td class="actions">
-        <button class="btn btn-view"  onclick="openViewModal(${u.id},'${u.user_type}')">
-          View
-        </button>
-        <button class="btn btn-edit"  onclick="openEditModal(${u.id},'${u.user_type}')">
-          Edit
-        </button>
-
-        <button class="btn btn-danger" onclick="openDeleteModal(${u.id},'${u.user_type}','${escAttr(u.username)}')">
-          Delete
-        </button>
-      </td>
-    </tr>`).join('');
-
-  lucide.createIcons();
-}
-
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
-}
-
-function escAttr(str) {
-  return String(str || '').replace(/'/g, "\\'");
 }
 
 /* ── Modal helpers ────────────────────────────────────────────────── */
@@ -241,8 +278,8 @@ async function submitCreate(e) {
     last_name:        document.getElementById('cLastName').value.trim(),
     username:         document.getElementById('cUsername').value.trim(),
     email:            document.getElementById('cEmail').value.trim(),
-    password:         document.getElementById('cPassword').value,
-    confirm_password: document.getElementById('cConfirmPassword').value,
+    password:         document.getElementById('cPassword').value.trim(),
+    confirm_password: document.getElementById('cConfirmPassword').value.trim(),
     user_type:        type,
   };
 
@@ -286,6 +323,8 @@ async function openEditModal(id, type) {
     document.getElementById('eLastName').value  = u.last_name  || '';
     document.getElementById('eEmail').value     = u.email      || '';
     document.getElementById('ePhone').value     = u.phone      || '';
+    document.getElementById('ePassword').value  = u.password   || '';
+    document.getElementById('eConfirmPassword').value = u.password || '';
     document.getElementById('eBio').value       = u.bio        || '';
 
     document.getElementById('editModal').style.display = 'flex';
@@ -305,6 +344,8 @@ async function submitEdit(e) {
     last_name:  document.getElementById('eLastName').value.trim(),
     email:      document.getElementById('eEmail').value.trim(),
     phone:      document.getElementById('ePhone').value.trim(),
+    password:   document.getElementById('ePassword').value.trim(),
+    confirm_password: document.getElementById('eConfirmPassword').value.trim(),
     bio:        document.getElementById('eBio').value.trim(),
   };
 
@@ -332,12 +373,10 @@ function openPatchModal(id, type) {
   patchingUserId   = id;
   patchingUserType = type;
 
-  /* Clear fields */
   ['pFirstName','pLastName','pEmail','pPhone','pBio'].forEach(f => {
     document.getElementById(f).value = '';
   });
 
-  /* Label badge */
   const badge = document.getElementById('patchTypeBadge');
   badge.textContent  = type;
   badge.className    = 'badge-type ' + (type === 'Admin' ? 'badge-admin' : 'badge-staff');
@@ -351,7 +390,6 @@ async function submitPatch(e) {
     ? `${API}/users/admin/partialedit/${patchingUserId}/`
     : `${API}/users/staff/partialedit/${patchingUserId}/`;
 
-  /* Only include non-empty fields */
   const body = {};
   const map = {
     first_name: 'pFirstName',
@@ -418,5 +456,43 @@ async function confirmDelete() {
   }
 }
 
-/* ── Bootstrap ───────────────────────────────────────────────────── */
+/* ── RESET PASSWORD ───────────────────────────────── */
+async function openResetPasswordModal(userId) {
+  try {
+    const res = await fetch(`${API}/users/${userId}/reset-password/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      showAlert(err.error || 'Failed to reset password.', false);
+      return;
+    }
+
+    const data = await res.json();
+    const tempPassword = data.temporary_password;
+
+    // Show modal with temp password
+    document.getElementById('resetPwMessage').textContent =
+      `Password reset initiated. A temporary 12-character password has been generated.`;
+    document.getElementById('tempPasswordDisplay').value = tempPassword;
+    document.getElementById('resetPasswordModal').style.display = 'flex';
+
+    showAlert('Password reset successful! Share the temporary password with the user.', true);
+  } catch (err) {
+    console.error(err);
+    showAlert('Network error. Could not reset password.', false);
+  }
+}
+
+function copyTempPassword() {
+  const field = document.getElementById('tempPasswordDisplay');
+  field.select();
+  document.execCommand('copy');
+  showAlert('Password copied to clipboard!', true);
+}
+
+/* ── Bootstrap ───────────────────────────────────── */
 loadUsers();
