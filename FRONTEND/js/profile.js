@@ -45,6 +45,13 @@ async function loadProfile() {
     document.getElementById('profileDisplayName').textContent =
       `${p.first_name || ''} ${p.last_name || ''}`.trim() || p.username;
 
+    // Display account type label dynamically
+    const roleBadgeText = document.getElementById('profileRoleBadgeText');
+    if (roleBadgeText) {
+      roleBadgeText.textContent = p.account_type_label ||
+        (p.user_type === 'Admin' ? 'Admin \u2022 Haneus Cafe Owner' : 'Staff \u2022 Haneus Cafe Employee');
+    }
+
     // Display profile picture (new field) or avatar_url (legacy fallback)
     const pictureUrl = p.profile_picture_url || p.avatar_url;
     if (pictureUrl) {

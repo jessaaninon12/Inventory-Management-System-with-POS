@@ -50,20 +50,6 @@ class ProductService:
             "total_pages": total_pages,
         }
 
-    def get_products_paginated(self, page=1, limit=30):
-        """Return paginated ProductDTOs with metadata."""
-        offset = max(page - 1, 0) * limit
-        entities = self.repository.get_paginated(offset=offset, limit=limit)
-        total_count = self.repository.get_total_count()
-        total_pages = (total_count + limit - 1) // limit if limit else 0
-        return {
-            "products": [ProductDTO.from_entity(e) for e in entities],
-            "total_count": total_count,
-            "page": page,
-            "limit": limit,
-            "total_pages": total_pages,
-        }
-
     # ------------------------------------------------------------------
     # Commands
     # ------------------------------------------------------------------
@@ -84,6 +70,8 @@ class ProductService:
         errors = entity.validate()
         if errors:
             raise ValueError(errors)
+        # Auto-sync orderability with stock level
+        entity.is_orderable = entity.stock > 0
         saved = self.repository.create(entity)
         return ProductDTO.from_entity(saved)
 
@@ -116,6 +104,9 @@ class ProductService:
         errors = entity.validate()
         if errors:
             raise ValueError(errors)
+
+        # Auto-sync orderability with stock level
+        entity.is_orderable = entity.stock > 0
 
         saved = self.repository.update(entity)
         return ProductDTO.from_entity(saved)

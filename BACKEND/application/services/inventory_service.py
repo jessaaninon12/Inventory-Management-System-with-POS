@@ -74,6 +74,9 @@ class InventoryService:
         # Apply business rule on the product entity
         product.adjust_stock(dto.quantity_change)
 
+        # Auto-sync orderability flag with new stock level
+        product.is_orderable = product.stock > 0
+
         # Persist both changes
         self.product_repo.update(product)
         saved = self.inventory_repo.create_transaction(transaction)

@@ -242,7 +242,7 @@ function closeDeleteStockModal() {
 async function confirmDeleteStock() {
   if (!deletingProductId) return;
   try {
-    const res = await fetch(`${API}/products/${deletingProductId}/delete/`, { method: 'DELETE' });
+    const res = await fetch(`${API}/products/delete/${deletingProductId}/`, { method: 'DELETE' });
     if (!res.ok && res.status !== 204) {
       const err = await res.json().catch(() => ({}));
       showErrorModal('Delete failed: ' + JSON.stringify(err));
@@ -379,20 +379,6 @@ document.addEventListener('keydown', e => {
 // ── Receive Stock button ─────────────────────────────────────────
 document.getElementById('receiveStockBtn')?.addEventListener('click', openReceiveStockModal);
 
-// ── Low stock badge on page load ───────────────────────────────
-(async function initLowStockBadge() {
-  try {
-    const res = await fetch(`${API}/products/low-stock/`);
-    if (!res.ok) return;
-    const products = await res.json();
-    const btnBadge = document.getElementById('lowStockBadge');
-    if (btnBadge && products.length > 0) {
-      btnBadge.textContent = products.length;
-      btnBadge.style.display = 'inline';
-    }
-  } catch { /* silent */ }
-}());
-
-// ── Init ──────────────────────────────────────────────────────
+// ── Init (low-stock badge is loaded as part of loadProducts) ─────────────────
 loadProducts();
 

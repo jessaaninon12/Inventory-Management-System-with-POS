@@ -61,13 +61,21 @@ class ApprovalRequestListController(APIView):
     """
     GET /api/admin/approval-requests/
     List all pending admin approval requests.
+    Cached for 30 seconds to prevent 429 from repeated badge polling.
+    Cache is cleared automatically when an approval decision is made.
     
     Response: { requests: [ { id, user_id, user_name, email, status, created_at }, ... ] }
     """
 
     @extend_schema(tags=["Admin – Approvals"], responses={200: None})
     def get(self, request):
-        requests = AdminApprovalRequest.objects.filter(
+        from django.core.cache import cache
+        cache_key = "admin:approval_requests:pending"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+
+        pending = AdminApprovalRequest.objects.filter(
             status="pending"
         ).select_related("user").order_by("-created_at")
         
@@ -75,15 +83,17 @@ class ApprovalRequestListController(APIView):
             {
                 "id": req.id,
                 "user_id": req.user.id,
-                "user_name": f"{req.user.first_name} {req.user.last_name}".strip(),
+                "user_name": f"{req.user.first_name} {req.user.last_name}".strip() or req.user.username,
                 "email": req.user.email,
                 "status": req.status,
                 "created_at": req.created_at.isoformat(),
             }
-            for req in requests
+            for req in pending
         ]
         
-        return Response({"requests": data})
+        result = {"requests": data}
+        cache.set(cache_key, result, timeout=30)  # cache 30 seconds
+        return Response(result)
 
 
 class ApproveUserController(APIView):
@@ -133,10 +143,13 @@ class ApproveUserController(APIView):
         
         # Update approval request
         from django.utils import timezone
+        from django.core.cache import cache
         approval_request.status = "approved"
         approval_request.decided_at = timezone.now()
         approval_request.decided_by = approver
         approval_request.save()
+        # Invalidate cached approval list so badge updates immediately
+        cache.delete("admin:approval_requests:pending")
         
         return Response(
             {
@@ -197,10 +210,13 @@ class RejectUserController(APIView):
         
         # Update approval request
         from django.utils import timezone
+        from django.core.cache import cache
         approval_request.status = "rejected"
         approval_request.decided_at = timezone.now()
         approval_request.decided_by = approver
         approval_request.save()
+        # Invalidate cached approval list so badge updates immediately
+        cache.delete("admin:approval_requests:pending")
         
         # Optionally delete the user
         if delete_user:

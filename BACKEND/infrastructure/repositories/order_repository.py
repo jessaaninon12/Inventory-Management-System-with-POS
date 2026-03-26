@@ -2,6 +2,8 @@
 Order repository — concrete implementation using Django ORM.
 """
 
+from django.utils import timezone
+
 from application.interfaces.order_repository_interface import (
     OrderRepositoryInterface,
 )
@@ -39,11 +41,29 @@ class OrderRepository(OrderRepositoryInterface):
     # Commands
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _make_aware(dt):
+        """Convert a naive datetime or date string to timezone-aware. Prevents Django TZ warnings."""
+        if dt is None:
+            return timezone.now()
+        if isinstance(dt, str):
+            try:
+                from django.utils.dateparse import parse_datetime
+                parsed = parse_datetime(dt)
+                if parsed is None:
+                    return timezone.now()
+                dt = parsed
+            except Exception:
+                return timezone.now()
+        if hasattr(dt, 'tzinfo') and dt.tzinfo is None:
+            return timezone.make_aware(dt)
+        return dt
+
     def create(self, order: Order):
         m = OrderModel.objects.create(
             order_id=order.order_id,
             customer_name=order.customer_name,
-            date=order.date,
+            date=self._make_aware(order.date),
             status=order.status,
         )
         for item in order.items:
@@ -60,7 +80,7 @@ class OrderRepository(OrderRepositoryInterface):
         OrderModel.objects.filter(pk=order.id).update(
             customer_name=order.customer_name,
             status=order.status,
-            date=order.date,
+            date=self._make_aware(order.date),
         )
         return self.get_by_id(order.id)
 

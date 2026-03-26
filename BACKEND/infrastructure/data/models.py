@@ -70,6 +70,11 @@ class ProductModel(models.Model):
     description = models.TextField(blank=True, default="")
     low_stock_threshold = models.IntegerField(default=10)
     image_url = models.TextField(blank=True, null=True)  # stores URL or base64 data URI
+    # Supplier reference fields
+    supplier_name = models.CharField(max_length=200, blank=True, default="")
+    supplier_contact = models.CharField(max_length=200, blank=True, default="")
+    # Orderability flag — synced with stock level
+    is_orderable = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

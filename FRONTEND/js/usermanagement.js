@@ -235,6 +235,12 @@ async function openViewModal(id, type) {
     if (!res.ok) throw new Error('Not found');
     const u = await res.json();
 
+    // Profile picture (use profile_picture_url, fallback to avatar_url)
+    const pictureUrl = u.profile_picture_url || u.avatar_url || '';
+    const pictureSrc = pictureUrl
+      ? (pictureUrl.startsWith('http') ? pictureUrl : `http://127.0.0.1:8000${pictureUrl}`)
+      : 'https://static.vecteezy.com/system/resources/previews/014/194/215/original/avatar-icon-human-a-person-s-badge-social-media-profile-symbol-the-symbol-of-a-person-vector.jpg';
+
     const fields = [
       ['ID',          `#${u.id}`],
       ['Username',    u.username   || '—'],
@@ -247,11 +253,18 @@ async function openViewModal(id, type) {
       ['Bio',         u.bio        || '—'],
     ];
 
-    document.getElementById('viewDetails').innerHTML = fields.map(([label, val]) => `
-      <div class="detail-item">
-        <div class="detail-label">${label}</div>
-        <div class="detail-value">${val}</div>
-      </div>`).join('');
+    document.getElementById('viewDetails').innerHTML =
+      `<div style="text-align:center;margin-bottom:1.25rem;">
+         <img src="${pictureSrc}" alt="Profile Picture"
+              onerror="this.src='https://static.vecteezy.com/system/resources/previews/014/194/215/original/avatar-icon-human-a-person-s-badge-social-media-profile-symbol-the-symbol-of-a-person-vector.jpg'"
+              style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #ddd;" />
+         <div style="margin-top:0.5rem;font-weight:600;font-size:0.95rem;">${escHtml((u.first_name || '') + ' ' + (u.last_name || '')).trim() || u.username}</div>
+       </div>` +
+      fields.map(([label, val]) => `
+        <div class="detail-item">
+          <div class="detail-label">${label}</div>
+          <div class="detail-value">${val}</div>
+        </div>`).join('');
 
     document.getElementById('viewModal').style.display = 'flex';
     lucide.createIcons();
@@ -324,6 +337,12 @@ async function openEditModal(id, type) {
     document.getElementById('eEmail').value     = u.email      || '';
     document.getElementById('ePhone').value     = u.phone      || '';
     document.getElementById('eBio').value       = u.bio        || '';
+
+    // Wire the reset password button for this user
+    const resetBtn = document.getElementById('editResetPasswordBtn');
+    if (resetBtn) {
+      resetBtn.onclick = () => { closeModal('editModal'); openResetPasswordModal(id); };
+    }
 
     document.getElementById('editModal').style.display = 'flex';
   } catch {

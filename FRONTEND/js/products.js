@@ -123,7 +123,7 @@ function renderGrid(products) {
   grid.innerHTML = products.map(p => {
     const statusCls = p.stock_status === 'In Stock'  ? 'status-in-stock'
                     : p.stock_status === 'Low Stock'  ? 'status-low' : 'status-out';
-  const imgSrc    = p.image_url || fallback;
+    const imgSrc    = p.image_url || fallback;
     return `
       <div class="product-card">
         <div class="product-card-img">
@@ -141,6 +141,10 @@ function renderGrid(products) {
           </div>
         </div>
         <div class="product-card-actions">
+          <button class="btn-icon" title="View" onclick="openProductViewModal(${p.id})"
+                  style="color:#0284c7;background:#dbeafe;border:none;border-radius:0.375rem;padding:0.35rem;cursor:pointer;">
+            <i data-lucide="eye"></i>
+          </button>
           <button class="btn-icon btn-icon-edit" title="Edit" onclick="openEditModal(${p.id})">
             <i data-lucide="pencil"></i>
           </button>
@@ -153,6 +157,45 @@ function renderGrid(products) {
   }).join('');
   lucide.createIcons();
 }
+
+// ── Product View Modal ────────────────────────────────────────────
+function openProductViewModal(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+
+  const fallback = 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400';
+  const imgSrc   = p.image_url || fallback;
+  const statusCls = p.stock_status === 'In Stock'  ? '#16a34a'
+                  : p.stock_status === 'Low Stock'  ? '#b45309' : '#b91c1c';
+
+  document.getElementById('pvModal').style.display = 'flex';
+  document.getElementById('pvModalBody').innerHTML = `
+    <div style="text-align:center;margin-bottom:1.25rem;">
+      <img src="${escHtml(imgSrc)}" alt="${escHtml(p.name)}"
+           onerror="this.src='${fallback}'"
+           style="width:160px;height:160px;object-fit:cover;border-radius:0.75rem;border:1px solid #ddd;" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Name</div><div style="font-weight:600;">${escHtml(p.name)}</div></div>
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Category</div><div>${escHtml(p.category)}</div></div>
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Price</div><div style="font-weight:600;color:#c47b42;">&#8369;${parseFloat(p.price).toFixed(2)}</div></div>
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Cost</div><div>&#8369;${parseFloat(p.cost || 0).toFixed(2)}</div></div>
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Stock</div><div>${p.stock} ${escHtml(p.unit || '')}</div></div>
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Status</div><div style="color:${statusCls};font-weight:600;">${escHtml(p.stock_status)}</div></div>
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Reorder At</div><div>${p.low_stock_threshold}</div></div>
+      <div><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Unit</div><div>${escHtml(p.unit || '—')}</div></div>
+      ${p.supplier_name ? `<div style="grid-column:1/-1;"><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Supplier</div><div>${escHtml(p.supplier_name)}</div></div>` : ''}
+      ${p.supplier_contact ? `<div style="grid-column:1/-1;"><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Supplier Contact</div><div>${escHtml(p.supplier_contact)}</div></div>` : ''}
+      ${p.description ? `<div style="grid-column:1/-1;"><div style="font-size:0.7rem;color:#999;text-transform:uppercase;margin-bottom:0.2rem;">Description</div><div style="font-size:0.875rem;color:#555;">${escHtml(p.description)}</div></div>` : ''}
+    </div>`;
+  lucide.createIcons();
+}
+function closeProductViewModal() {
+  document.getElementById('pvModal').style.display = 'none';
+}
+window.addEventListener('click', e => {
+  if (e.target === document.getElementById('pvModal')) closeProductViewModal();
+});
 
 document.getElementById('productSearch')?.addEventListener('input',  applyFilterSort);
 document.getElementById('productSort')?.addEventListener('change', applyFilterSort);

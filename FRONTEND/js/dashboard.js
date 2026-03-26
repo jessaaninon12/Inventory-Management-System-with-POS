@@ -358,24 +358,43 @@ function _selectNotif(id) {
   if (n.type === 'approval_pending') {
     const typeBg    = '#dbeafe';
     const typeColor = '#0284c7';
+    const safeUserId = n.userId || 0;
+    const safeNotifId = String(n.id || '').replace(/'/g, '');
     detail.innerHTML = `
       <div class="notif-detail-content">
         <span style="background:${typeBg};color:${typeColor};padding:0.2rem 0.65rem;border-radius:999px;font-size:0.75rem;font-weight:600;">${n.title}</span>
-        <h3 style="font-size:0.975rem;font-weight:600;color:var(--espresso);margin:0.625rem 0 0.25rem;">${n.userName}</h3>
+        <h3 style="font-size:0.975rem;font-weight:600;color:var(--espresso);margin:0.625rem 0 0.25rem;">${n.userName || 'Unknown'}</h3>
         <p style="font-size:0.83rem;color:var(--mocha);line-height:1.6;margin-bottom:0.75rem;">${n.message}</p>
         <div style="background:var(--cream);border-radius:0.5rem;padding:0.625rem;margin-bottom:0.75rem;">
           <div style="font-size:0.68rem;color:var(--mocha);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">Email</div>
-          <div style="font-size:0.9rem;color:var(--espresso);">${n.userEmail}</div>
+          <div style="font-size:0.9rem;color:var(--espresso);">${n.userEmail || '—'}</div>
         </div>
         <div style="display:flex;gap:0.5rem;margin-top:1rem;">
-          <button onclick="_approveUser(${n.userId}, '${n.id}')" style="flex:1;padding:0.5rem;background:#10b981;color:white;border:none;border-radius:0.375rem;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
+          <button id="approveBtn_${safeUserId}" data-userid="${safeUserId}" data-notifid="${safeNotifId}"
+                  style="flex:1;padding:0.5rem;background:#10b981;color:white;border:none;border-radius:0.375rem;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.3s;position:relative;z-index:10001;">
             ✓ Approve
           </button>
-          <button onclick="_rejectUser(${n.userId}, '${n.id}')" style="flex:1;padding:0.5rem;background:#ef4444;color:white;border:none;border-radius:0.375rem;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
+          <button id="rejectBtn_${safeUserId}" data-userid="${safeUserId}" data-notifid="${safeNotifId}"
+                  style="flex:1;padding:0.5rem;background:#ef4444;color:white;border:none;border-radius:0.375rem;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.3s;position:relative;z-index:10001;">
             ✕ Reject
           </button>
         </div>
       </div>`;
+    // Use event listeners (not onclick) so buttons work reliably regardless of DOM state
+    const approveBtn = document.getElementById(`approveBtn_${safeUserId}`);
+    const rejectBtn  = document.getElementById(`rejectBtn_${safeUserId}`);
+    if (approveBtn) {
+      approveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        _approveUser(parseInt(approveBtn.dataset.userid), approveBtn.dataset.notifid);
+      });
+    }
+    if (rejectBtn) {
+      rejectBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        _rejectUser(parseInt(rejectBtn.dataset.userid), rejectBtn.dataset.notifid);
+      });
+    }
   } else {
     // Handle stock notifications
     const typeColor = n.type === 'out_of_stock' ? '#b91c1c' : n.type === 'critical' ? '#92400e' : '#b45309';
@@ -497,5 +516,24 @@ document.getElementById('clearAllBtn')?.addEventListener('click', () => {
   _selectedNotifId = null;
 });
 
-// Init badge on load (silent, non-blocking)
-_buildNotifications();
+// Init badge on load: only update the badge counter, do NOT fetch full notification data
+// Full notification list is built when the bell is clicked to avoid 429 on page load.
+(async function initNotifBadgeOnly() {
+  try {
+    const res = await fetch(`${API_BASE}/products/low-stock/`);
+    if (!res.ok) return;
+    const products = await res.json();
+    const store    = _loadStore();
+    const storeMap = {};
+    store.forEach(n => { storeMap[n.id] = n; });
+    // Count unread from previous store
+    const unread = store.filter(n => !n.read).length;
+    // Update badge with at least the low-stock count
+    const badge = document.getElementById('notifBadge');
+    if (badge) {
+      const count = Math.max(unread, products.length);
+      badge.textContent = count > 9 ? '9+' : String(count);
+      badge.classList.toggle('visible', count > 0);
+    }
+  } catch { /* silent */ }
+}());
