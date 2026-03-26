@@ -13,7 +13,12 @@
   <link rel="stylesheet" href="css/payment-modals.css">
 </head>
 <body>
-
+  <script>
+    if (localStorage.getItem('user_type') === 'Staff') {
+      window.location.href = 'staffdashboard.html';
+    }
+  </script>
+  <!-- rest of the page -->
 <div class="app-container">
 
   <!-- Mobile sidebar overlay -->

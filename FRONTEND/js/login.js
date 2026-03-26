@@ -13,9 +13,12 @@ document.getElementById('togglePw').addEventListener('click', () => {
 const loginForm = document.getElementById('loginForm');
 const loginBtn  = document.getElementById('loginBtn');
 const errorMsg  = document.getElementById('errorMsg');
+let isLoggingIn = false;   // prevent multiple submissions
 
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (isLoggingIn) return;  // already in progress
+
   errorMsg.style.display = 'none';
 
   const username  = document.getElementById('username').value.trim();
@@ -27,6 +30,7 @@ loginForm.addEventListener('submit', async (e) => {
     return;
   }
 
+  isLoggingIn = true;
   loginBtn.disabled    = true;
   loginBtn.textContent = 'Logging in...';
 
@@ -39,7 +43,9 @@ loginForm.addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (res.ok && data.success) {
+      // Store user data and role separately
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('user_type', data.user.user_type);
 
       // Show full-page success overlay with spinner
       document.getElementById('welcomeMsg').textContent =
@@ -64,12 +70,14 @@ loginForm.addEventListener('submit', async (e) => {
       errorMsg.style.display = 'block';
       loginBtn.disabled    = false;
       loginBtn.textContent = 'Login';
+      isLoggingIn = false;
     }
   } catch {
     errorMsg.textContent = 'Cannot connect to server. Make sure the backend is running.';
     errorMsg.style.display = 'block';
     loginBtn.disabled    = false;
     loginBtn.textContent = 'Login';
+    isLoggingIn = false;
   }
 });
 
@@ -134,7 +142,7 @@ sendBtn.addEventListener('click', async () => {
     showResetFeedback('Network error. Could not send request.', true);
   } finally {
     sendBtn.disabled = false;
-    sendBtn.textContent = 'Send Reset Link';s
+    sendBtn.textContent = 'Send Reset Link';
   }
 });
 
